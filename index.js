@@ -1,6 +1,11 @@
+/*
+ * Copyright (C) 2014 Dylan Barrell, all rights reserved
+ *
+ * Licensed under the MIT license
+ *
+ */
+
 var path = require('path');
-var through = require('through');
-var gutil = require('gulp-util');
 var fs = require('fs');
 var cover = require('./contrib/cover');
 var Duplex = require('stream').Duplex;
