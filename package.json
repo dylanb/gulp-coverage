@@ -1,0 +1,31 @@
+{
+  "name": "gulp-coverage",
+  "version": "0.0.2",
+  "description": "'Instrument and generate code coverage independent of test runner'",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "dependencies": {
+    "jade": "*",
+    "gulp-util": "~2.2.0",
+    "through": "~2.3.0",
+    "underscore": "*"
+  },
+  "devDependencies": {
+    "gulp": "~3.2.4",
+    "gulp-mocha": "*"
+  },
+  "keywords": [
+    "Code Coverage",
+    "Mocha",
+    "Jasmin",
+    "gulpplugin"
+  ],
+  "author": "dylan@barrell.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dylanb/gulp-coverage.git"
+  }
+}

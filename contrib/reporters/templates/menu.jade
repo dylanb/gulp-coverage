@@ -1,0 +1,10 @@
+#menu
+  li
+    a(href='#overview') overview
+  for file in cov.files
+    li
+      span.cov(class=coverageClass(file.coverage)) #{file.coverage | 0}
+      a(href='##{file.filename}')
+        if file.segments
+          span.dirname= file.segments
+        span.basename= file.basename

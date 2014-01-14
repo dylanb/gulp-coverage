@@ -13,3 +13,9 @@ results
 
 npm-debug.log
 node_modules
+debug
+.coverrun
+.coverdata
+coverage.html
+.DS_Store
+
