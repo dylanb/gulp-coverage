@@ -10,13 +10,6 @@ var fs = require('fs');
 
 exports = module.exports = HTMLCov;
 
-/**
- * Initialize a new `JsCoverage` reporter.
- *
- * @param {Runner} runner
- * @api public
- */
-
 function HTMLCov(coverageData, filename) {
   var jade = require('jade'), 
     file = __dirname + '/templates/coverage.jade',
@@ -32,13 +25,6 @@ function HTMLCov(coverageData, filename) {
         fs.writeFileSync(filename, output);
     }
 }
-
-/**
- * Return coverage class for `n`.
- *
- * @return {String}
- * @api private
- */
 
 function coverageClass(n) {
   if (n >= 75) return 'high';
