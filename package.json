@@ -7,12 +7,12 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "jade": "*",
-    "underscore": "*"
+    "jade": "~1.1.4",
+    "underscore": "~1.5.2"
   },
   "devDependencies": {
     "gulp": "~3.2.4",
-    "gulp-mocha": "*"
+    "gulp-mocha": "~0.3.0"
   },
   "keywords": [
     "Code Coverage",
