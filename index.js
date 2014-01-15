@@ -18,7 +18,6 @@ module.exports.instrument = function (options) {
     coverInst = cover.cover(options.filePattern, options.ignoreFiles, options.debugDirectory);
 
     duplex._write = function (file, encoding, done) {
-        console.log('file.path: ', file.path);
         duplex.push(file);
         done();
     };

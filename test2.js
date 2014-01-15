@@ -4,10 +4,10 @@ module.exports = function () {
 
     for (i = 0; i < 10; i++) {
         if (false) {
-            console.log('WOOOOOAHH, wormhole dude\n');
+            retVal/0;
             retVal += 1;
         } else {
-            console.log('Does not match\n');
+            retVal = retVal;
         }
     }
     return retVal;

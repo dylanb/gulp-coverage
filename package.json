@@ -4,7 +4,7 @@
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "gulp test"
   },
   "dependencies": {
     "jade": "*",

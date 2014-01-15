@@ -357,6 +357,7 @@ var load = function(datas) {
 var cover = function(fileRegex, ignore, debugDirectory) {    
     var originalRequire = require.extensions['.js'];
     var match = null;
+    var coverageData = {};
     
     ignore = ignore || {};
     

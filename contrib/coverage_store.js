@@ -2,7 +2,6 @@
 //
 // Licensed under the MIT License
 
-console.log('global.coverageStore: ', global.coverageStore);
 (function() {
     global.coverageStore = global.coverageStore || {};
     var coverageStore = global.coverageStore,
@@ -15,7 +14,6 @@ console.log('global.coverageStore: ', global.coverageStore);
 
         filename = filename.replace(/[\/|\:|\\]/g, "_");
         if (!coverageStore[filename]) {
-            console.log('opening: ', filename);
             coverageStore[filename] = fs.openSync(runDirectory + filename, 'w');
         }
         return coverageStore[filename];
@@ -42,7 +40,6 @@ console.log('global.coverageStore: ', global.coverageStore);
         var filename;
         for (filename in coverageStore) {
             if (coverageStore.hasOwnProperty(filename)) {
-                console.log('closing: ', filename);
                 fs.closeSync(coverageStore[filename]);
                 delete coverageStore[filename];
             }

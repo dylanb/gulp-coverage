@@ -4,7 +4,6 @@
     var fs = require('fs');
     var <%= instrumented.names.statement %>, <%= instrumented.names.expression %>, <%= instrumented.names.block %>;
     var store = require('<%= coverageStorePath %>');
-    console.log('store: ', store);
     var fd = store.register('<%= filename %>');
     
     <%= instrumented.names.statement %> = function(i) {
