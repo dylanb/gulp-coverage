@@ -1,4 +1,4 @@
-var assert = require('assert')
+var assert = require('assert'),
     cover = require('../contrib/cover.js'),
     fs = require('fs'),
     path = require('path');
@@ -67,7 +67,7 @@ describe('cover.js', function () {
             delete require.cache[require.resolve('../test')];
             cover.cleanup();
             cover.init();
-            coverInst = cover.cover('test.js', undefined, process.cwd() + '/debug/');
+            coverInst = cover.cover('**/test.js', process.cwd() + '/debug/');
         });
         it('will cause the require function to instrument the file', function () {
             var test = require('../test'),
@@ -89,7 +89,7 @@ describe('cover.js', function () {
             var test, coverInst, stats, filename;
             cover.cleanup();
             cover.init();
-            coverInst = cover.cover('test2.js');
+            coverInst = cover.cover('**/test2.js');
             test = require('../test2');
             filename = require.resolve('../test2');
             test();

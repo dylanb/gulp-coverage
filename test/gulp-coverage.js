@@ -1,6 +1,8 @@
 var assert = require('assert'),
     cover = require('../index.js'),
     Stream = require('stream'),
+    fs = require('fs'),
+    path = require('path'),
     mocha = require('gulp-mocha');
 
 function removeDir(dir) {
@@ -37,7 +39,7 @@ describe('gulp-coverage', function () {
             cb();
         };
 
-        reader = new Stream.Duplex({objectMode: true})
+        reader = new Stream.Duplex({objectMode: true});
         reader._read = writer._read = function () {};
     });
     describe('instrument', function () {
@@ -58,8 +60,7 @@ describe('gulp-coverage', function () {
 
 
             writer.pipe(cover.instrument({
-                filePattern: 'test',
-                ignoreFiles: undefined,
+                pattern: ['**/test*'],
                 debugDirectory: process.cwd() + '/debug/'
             })).pipe(mocha({
             })).pipe(reader);
@@ -82,8 +83,7 @@ describe('gulp-coverage', function () {
             };
 
             writer.pipe(cover.instrument({
-                filePattern: 'test',
-                ignoreFiles: undefined,
+                pattern: ['**/test*'],
                 debugDirectory: process.cwd() + '/debug/'
             })).pipe(mocha({
             })).pipe(cover.report({

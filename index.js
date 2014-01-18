@@ -15,7 +15,7 @@ module.exports.instrument = function (options) {
     var duplex = new Duplex({objectMode: true});
     cover.cleanup();
     cover.init();
-    coverInst = cover.cover(options.filePattern, options.ignoreFiles, options.debugDirectory);
+    coverInst = cover.cover(options.pattern, options.debugDirectory);
 
     duplex._write = function (file, encoding, done) {
         duplex.push(file);
@@ -36,27 +36,28 @@ module.exports.report = function (options) {
             filename, item, fstats, lines, sourceArray, segments,
             totSloc = 0, totCovered = 0;
         if (!coverInst) {
-            throw 'Must call instrument before calling report';
+            throw new Error('Must call instrument before calling report');
         }
-        for (filename in coverInst.coverageData) {
+        Object.keys(coverInst.coverageData).forEach(function(filename) {
             fstats = coverInst.coverageData[filename].stats();
             lines = fstats.source.split('\n');
             sourceArray = [];
-            lines.forEach(function(line, index) {
-                var found = false;
-                fstats.lines.forEach(function(missedLine) {
-                    if (index+1 === missedLine.lineno) {
+            lines.forEach(function (line, index) {
+                var found = false,
+                    lineStruct;
+                fstats.lines.forEach(function (missedLine) {
+                    if (index + 1 === missedLine.lineno) {
                         found = true;
                     }
                 });
                 if (!found) {
                     totCovered += 1;
                 }
-                var lineStruct = {
+                lineStruct = {
                     coverage: !found ? 1 : 0,
                     source: lines[index]
-                }
-                sourceArray.push(lineStruct)
+                };
+                sourceArray.push(lineStruct);
             });
             segments = filename.split('/');
             item = {
@@ -69,7 +70,7 @@ module.exports.report = function (options) {
             };
             totSloc += lines.length;
             stats.files.push(item);
-        }
+        });
         stats.sloc = totSloc;
         stats.coverage = totCovered / totSloc * 100;
         cover.reporters[reporter](stats, options.outFile ? __dirname + '/' + options.outFile : undefined);

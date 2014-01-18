@@ -1,9 +1,10 @@
-var instrument     = require('./instrument')
-var Module         = require('module').Module;
-var path           = require('path');
-var fs             = require('fs');
-var vm             = require('vm');
-var _              = require('underscore');
+var instrument = require('./instrument');
+var Module = require('module').Module;
+var path = require('path');
+var fs = require('fs');
+var vm = require('vm');
+var _ = require('underscore');
+var multimatch = require('multimatch');
 
 // Coverage tracker
 function CoverageData (filename, instrumentor) {
@@ -12,17 +13,19 @@ function CoverageData (filename, instrumentor) {
     this.nodes = {};
     this.visitedBlocks = {};
     this.source = instrumentor.source;
-};
+}
 
 // Note that a node has been visited
 CoverageData.prototype.visit = function(node) {
-    var node = this.nodes[node.id] = (this.nodes[node.id] || {node:node, count:0})
-    node.count++;
+    this.nodes[node.id] = (this.nodes[node.id] || { node : node, count : 0});
+
+    this.nodes[node.id].count++;
 };
 
 // Note that a node has been visited
 CoverageData.prototype.visitBlock = function(blockIndex) {
-    var block = this.visitedBlocks[blockIndex] = (this.visitedBlocks[blockIndex] || {count:0})
+    var block = this.visitedBlocks[blockIndex] = (this.visitedBlocks[blockIndex] || {count:0});
+
     block.count++;
 };
 
@@ -117,7 +120,7 @@ var explodeNodes = function(coverageData, fileData) {
     }
     
     return newNodes;
-}
+};
 
 // Get per-line code coverage information
 CoverageData.prototype.coverage = function() {  
@@ -200,7 +203,8 @@ CoverageData.prototype.coverage = function() {
 
 CoverageData.prototype.prepare = function() {
     var data = require('./coverage_store').getStoreData(this.filename),
-        data, rawData, store;
+        rawData, store, index;
+
     data = '[' + data  + '{}]';
     rawData = JSON.parse(data);
     store = {nodes: {}, blocks: {}};
@@ -221,13 +225,14 @@ CoverageData.prototype.prepare = function() {
             store.nodes[it.node].count += 1;
         }
     });
-    for(var index in store.nodes) {
+
+    for (index in store.nodes) {
         if (store.nodes.hasOwnProperty(index)) {
             this.nodes[index] = {node: this.instrumentor.nodes[index], count: store.nodes[index].count};
         }
     }
     
-    for(var index in store.blocks) {
+    for (index in store.blocks) {
         if (store.blocks.hasOwnProperty(index)) {
             this.visitedBlocks[index] = {count: store.blocks[index].count};
         }
@@ -282,26 +287,25 @@ CoverageData.prototype.stats = function() {
 };
 
 var addInstrumentationHeader = function(template, filename, instrumented, coverageStorePath) {
-    var template = _.template(template);
-    var renderedSource = template({
-        instrumented: instrumented,
-        coverageStorePath: coverageStorePath,
-        filename: filename,
-        source: instrumented.instrumentedSource
-    });
-    
-    return renderedSource
+    var templ = _.template(template),
+        renderedSource = templ({
+            instrumented: instrumented,
+            coverageStorePath: coverageStorePath,
+            filename: filename,
+            source: instrumented.instrumentedSource
+        });
+    return renderedSource;
 };
 
 var stripBOM = function(content) {
-  // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
-  // because the buffer-to-string conversion in `fs.readFileSync()`
-  // translates it to FEFF, the UTF-16 BOM.
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1);
-  }
-  return content;
-}
+    // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+    // because the buffer-to-string conversion in `fs.readFileSync()`
+    // translates it to FEFF, the UTF-16 BOM.
+    if (content.charCodeAt(0) === 0xFEFF) {
+        content = content.slice(1);
+    }
+    return content;
+};
 
 var load = function(datas) {
     var combinedCoverage = {};
@@ -352,59 +356,40 @@ var load = function(datas) {
     });
     
     return combinedCoverage;
-}
+};
 
-var cover = function(fileRegex, ignore, debugDirectory) {    
+var cover = function(pattern, debugDirectory) {    
     var originalRequire = require.extensions['.js'];
-    var match = null;
     var coverageData = {};
-    
-    ignore = ignore || {};
-    
-    if (fileRegex instanceof RegExp) {
-        match = regex;
-    }
-    else {
-        match = new RegExp(fileRegex ? (fileRegex.replace(/\//g, '\\/').replace(/\./g, '\\.')) : ".*", '');
-    }
-        
+
     var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js").replace(/\\/g, "/");
     var templatePath = path.resolve(path.resolve(__dirname), "templates", "instrumentation_header.js");
     var template = fs.readFileSync(templatePath, 'utf-8');
-    
+
     require.extensions['.js'] = function(module, filename) {
         filename = filename.replace(/\\/g, "/");
 
-        if(!match.test(filename)) return originalRequire(module, filename);
-        if(filename === pathToCoverageStore) return originalRequire(module, filename);
-        
-        // If the specific file is to be ignored
-        var full = path.resolve(filename); 
-        if(ignore[full]) {
-          return originalRequire(module, filename);
-        }
-        
-        // If any of the parents of the file are to be ignored
-        do {
-          full = path.dirname(full);
-          if (ignore[full]) {
+        //console.log('filename: ', filename, ', pattern: ', pattern, ', match: ', multimatch(filename, pattern));
+        if (!multimatch(filename, pattern).length) {
             return originalRequire(module, filename);
-          }
-        } while(full !== path.dirname(full));
+        }
+        if (filename === pathToCoverageStore) {
+            return originalRequire(module, filename);
+        }
 
         var data = stripBOM(fs.readFileSync(filename, 'utf8').trim());
         data = data.replace(/^\#\!.*/, '');
-        
+
         var instrumented = instrument(data);
         coverageData[filename] = new CoverageData(filename, instrumented);
-        
+
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
-        
+
         if (debugDirectory) {
             var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, "_") + ".js");
             fs.writeFileSync(outputPath, newCode);
         }
-        
+
         return module._compile(newCode, filename);
     };
     

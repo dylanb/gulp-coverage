@@ -8,11 +8,13 @@
   },
   "dependencies": {
     "jade": "~1.1.4",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "multimatch": "~0.1.0"
   },
   "devDependencies": {
     "gulp": "~3.2.4",
-    "gulp-mocha": "~0.3.0"
+    "gulp-mocha": "~0.3.0",
+    "gulp-jshint": "~1.3.4"
   },
   "keywords": [
     "Code Coverage",

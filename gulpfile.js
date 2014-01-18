@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     cover = require('./index'),
     mocha = require('gulp-mocha'),
+    jshint = require('gulp-jshint'),
     exec = require('child_process').exec;
 
 
@@ -9,6 +10,12 @@ gulp.task('test', function () {
         .pipe(mocha({
             reporter: 'spec'
         }));
+});
+
+gulp.task('lint', function () {
+    gulp.src(['test/**/*.js', 'index.js', 'contrib/cover.js', 'contrib/coverage_store.js', 'contrib/reporters/**/*.js'])
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
 });
 
 gulp.task('debug', function () {
@@ -27,8 +34,7 @@ gulp.task('debug', function () {
 gulp.task('blnkt', function () {
     gulp.src(['src.js', 'src2.js', 'src3.js'], { read: false })
         .pipe(cover.instrument({
-            filePattern: 'test',
-            ignoreFiles: undefined,
+            pattern: ['**/test*'],
             debugDirectory: 'debug'
         }))
         .pipe(mocha({
@@ -41,8 +47,7 @@ gulp.task('blnkt', function () {
 gulp.task('blnkt2', function () {
     gulp.src(['src2.js', 'src3.js'], { read: false })
         .pipe(cover.instrument({
-            filePattern: 'test',
-            ignoreFiles: undefined,
+            pattern: ['**/test*'],
             debugDirectory: 'debug'
         }))
         .pipe(mocha({
