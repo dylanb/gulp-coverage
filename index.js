@@ -73,7 +73,7 @@ module.exports.report = function (options) {
         });
         stats.sloc = totSloc;
         stats.coverage = totCovered / totSloc * 100;
-        cover.reporters[reporter](stats, options.outFile ? __dirname + '/' + options.outFile : undefined);
+        cover.reporters[reporter](stats, options.outFile ? options.outFile : undefined);
         duplex.push(file);
         done();
     };

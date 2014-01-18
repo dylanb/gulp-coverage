@@ -40,7 +40,7 @@ gulp.task('blnkt', function () {
         .pipe(mocha({
         }))
         .pipe(cover.report({
-            outFile: 'coverage.html'
+            outFile: 'blnkt.html'
         }));
 });
 
@@ -53,7 +53,7 @@ gulp.task('blnkt2', function () {
         .pipe(mocha({
         }))
         .pipe(cover.report({
-            outFile: 'coverage.html'
+            outFile: 'blnkt2.html'
         }));
 });
 
