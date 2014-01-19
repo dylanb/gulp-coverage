@@ -1,7 +1,6 @@
 // Copyright 2011 Itay Neeman
 //
 // Licensed under the MIT License
-
 (function() {
     global.coverageStore = global.coverageStore || {};
     var coverageStore = global.coverageStore,

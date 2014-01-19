@@ -1,6 +1,6 @@
 var assert = require('assert'),
     cover = require('../index.js'),
-    Stream = require('stream'),
+    through2 = require('through2'),
     fs = require('fs'),
     path = require('path'),
     mocha = require('gulp-mocha');
@@ -25,27 +25,29 @@ function removeDirTree(dir) {
 describe('gulp-coverage', function () {
     var writer, reader;
     beforeEach(function () {
-        delete require.cache[require.resolve('../test2')];
-        delete require.cache[require.resolve('../src2')];
+        delete require.cache[require.resolve('../test')];
+        delete require.cache[require.resolve('../src')];
         if (fs.existsSync(process.cwd() + '/.coverdata')) {
             removeDirTree(process.cwd() + '/.coverdata');
         }
         if (fs.existsSync(process.cwd() + '/.coverrun')) {
             fs.unlinkSync(process.cwd() + '/.coverrun');
         }
-        writer = new Stream.Duplex({objectMode: true});
-        writer._write = function (file, encoding, cb) {
-            writer.push(file);
+        writer = through2.obj(function (chunk, enc, cb) {
+            this.push(chunk);
             cb();
-        };
-
-        reader = new Stream.Duplex({objectMode: true});
-        reader._read = writer._read = function () {};
+        }, function (cb) {
+            cb();
+        });
     });
     describe('instrument', function () {
         it('should instrument and collect data', function (done) {
-            reader._write = function () {
-                var filename = require.resolve('../test2');
+            reader = through2.obj(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            },
+            function (cb) {
+                var filename = require.resolve('../test');
                 // Should have created the coverdata directory
                 assert.ok(fs.existsSync(process.cwd() + '/.coverdata'));
                 // Should have created the run directory
@@ -55,19 +57,24 @@ describe('gulp-coverage', function () {
                 // Should have collected data
                 dataPath = path.join(process.cwd() + '/.coverdata/' + run, filename.replace(/[\/|\:|\\]/g, "_"));
                 assert.ok(fs.existsSync(dataPath));
+                cb();
                 done();
-            };
-
+            });
+            reader.on('error', function(){
+                console.log('error: ', arguments);
+            });
 
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
                 debugDirectory: process.cwd() + '/debug/'
-            })).pipe(mocha({
-            })).pipe(reader);
+            }))
+                .pipe(mocha({}))
+                .pipe(reader);
 
-            writer.write({
-                path: require.resolve('../src2')
+            writer.push({
+                path: require.resolve('../src.js')
             });
+            writer.end();
         });
     });
     describe('report', function () {
@@ -77,11 +84,17 @@ describe('gulp-coverage', function () {
             }
         });
         it('should create an HTML report', function (done) {
-            reader._write = function () {
+            reader = through2.obj(function (chunk, enc, cb) {
+                cb();
+            },
+            function (cb) {
                 assert.ok(fs.existsSync('coverage.html'));
+                cb();
                 done();
-            };
-
+            });
+            reader.on('error', function(){
+                console.log('error: ', arguments);
+            });
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
                 debugDirectory: process.cwd() + '/debug/'
@@ -92,8 +105,9 @@ describe('gulp-coverage', function () {
             })).pipe(reader);
 
             writer.write({
-                path: require.resolve('../src2')
+                path: require.resolve('../src.js')
             });
+            writer.end();
         });
     });
 });

@@ -38,6 +38,7 @@ gulp.task('blnkt', function () {
             debugDirectory: 'debug'
         }))
         .pipe(mocha({
+            reporter: 'spec'
         }))
         .pipe(cover.report({
             outFile: 'blnkt.html'
