@@ -85,17 +85,25 @@ describe('cover.js', function () {
         });
     });
     describe('coverInst.coverageData[filename].stats()', function () {
-        it('will return the stats for a particular coverage test', function () {
-            var test, coverInst, stats, filename;
-            cover.cleanup();
-            cover.init();
-            coverInst = cover.cover('**/test2.js');
-            test = require('../test2');
-            filename = require.resolve('../test2');
-            test();
-            stats = coverInst.coverageData[filename].stats();
+        var test, coverInst, stats, filename;
+        cover.cleanup();
+        cover.init();
+        coverInst = cover.cover('**/test2.js');
+        test = require('../test2');
+        filename = require.resolve('../test2');
+        test();
+        stats = coverInst.coverageData[filename].stats();
+        it('will return the correct number of covered lines', function () {
             assert.equal(stats.lines, 7);
+        });
+        it('will return the correct number of code lines', function () {
             assert.equal(stats.sloc, 9);
+        });
+        it('will return the correct number of covered statements', function () {
+            assert.equal(stats.statements, 9);
+        });
+        it('will return the correct number of statements', function () {
+            assert.equal(stats.ssoc, 13);
         });
     });
 });
