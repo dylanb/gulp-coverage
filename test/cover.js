@@ -129,5 +129,15 @@ describe('cover.js', function () {
             assert.equal(stats.lineDetails[0].count, 1);
             assert.equal(stats.lineDetails[13].count, 1);
         });
+        it('will return the correct line and position information for the statements', function () {
+            assert.equal(stats.lineDetails[4].statementDetails[0].loc.start.line, 5);
+            assert.equal(stats.lineDetails[4].statementDetails[0].loc.start.column, 16);
+            assert.equal(stats.lineDetails[4].statementDetails[0].loc.end.line, 5);
+            assert.equal(stats.lineDetails[4].statementDetails[0].loc.end.column, 22);
+            assert.equal(stats.lineDetails[4].statementDetails[2].loc.start.line, 5);
+            assert.equal(stats.lineDetails[4].statementDetails[2].loc.start.column, 24);
+            assert.equal(stats.lineDetails[4].statementDetails[2].loc.end.line, 5);
+            assert.equal(stats.lineDetails[4].statementDetails[2].loc.end.column, 27);
+        });
     });
 });
