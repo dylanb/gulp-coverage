@@ -111,5 +111,8 @@ describe('cover.js', function () {
         it('will return the correct number of blocks', function () {
             assert.equal(stats.sboc, 4);
         });
+        it('will return the lines of code as an array', function () {
+            assert.equal(stats.code.length, 14);
+        });
     });
 });
