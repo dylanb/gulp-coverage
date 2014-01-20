@@ -94,7 +94,8 @@ describe('cover.js', function () {
             filename = require.resolve('../test2');
             test();
             stats = coverInst.coverageData[filename].stats();
-            assert.equal(stats.percentage.toFixed(2), 0.86);
+            assert.equal(stats.lines, 7);
+            assert.equal(stats.sloc, 9);
         });
     });
 });
