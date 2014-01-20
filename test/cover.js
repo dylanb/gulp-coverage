@@ -106,7 +106,7 @@ describe('cover.js', function () {
             assert.equal(stats.ssoc, 13);
         });
         it('will return the correct number of covered blocks', function () {
-            assert.equal(stats.blocks, 2);
+            assert.equal(stats.blocks, 3);
         });
         it('will return the correct number of blocks', function () {
             assert.equal(stats.sboc, 4);
