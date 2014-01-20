@@ -114,5 +114,9 @@ describe('cover.js', function () {
         it('will return the lines of code as an array', function () {
             assert.equal(stats.code.length, 14);
         });
+        it('will return the code correctly', function () {
+            var codeArray = fs.readFileSync(filename).toString().trim().split('\n');
+            assert.deepEqual(stats.code, codeArray);
+        });
     });
 });
