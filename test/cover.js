@@ -118,5 +118,10 @@ describe('cover.js', function () {
             var codeArray = fs.readFileSync(filename).toString().trim().split('\n');
             assert.deepEqual(stats.code, codeArray);
         });
+        it('will return the correct lineDetails sparse array', function () {
+            assert.equal(stats.lineDetails.length, 14);
+            assert.equal(stats.lineDetails.filter(function(item){return item}).length, 9);
+        });
+
     });
 });
