@@ -48,7 +48,6 @@ function CoverageData (filename, instrumentor) {
 
 // Calculate node coverage statistics
 CoverageData.prototype.blocks = function() {
-    console.log('this.visitedBlocks: ', this.visitedBlocks);
     var totalBlocks = this.instrumentor.blockCounter;
     var numSeenBlocks = 0;
     for(var index in this.visitedBlocks) {
