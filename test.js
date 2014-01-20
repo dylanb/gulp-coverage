@@ -9,7 +9,7 @@ module.exports = function () {
             retVal += 1;
             retVal += 1;
         } else {
-            retVal = retVal;
+            retVal = (retVal > 100 ? retVal + 1 : retVal + 2);
         }
     }
     return retVal;
