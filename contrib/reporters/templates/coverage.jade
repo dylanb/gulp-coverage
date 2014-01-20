@@ -5,13 +5,15 @@ html
     include script.html
     include style.html
   body
-    #coverage
+    include menu
+    #coverage(role="main")
       h1#overview Coverage
-      include menu
 
-      #stats(class=coverageClass(cov.coverage))
-        .percentage #{cov.coverage | 0}%
-        .sloc= cov.sloc
+      #stats(class="stats #{coverageClass(cov.coverage)}")
+        .percentage #{cov.coverage | 0}% line coverage
+        .statements #{cov.statements | 0}% statement coverage
+        .blocks #{cov.blocks | 0}% block coverage
+        .sloc #{cov.sloc} SLOC
         .hits= cov.hits
         .misses= cov.misses
 
@@ -19,32 +21,39 @@ html
         for file in cov.files
           .file
             h2(id=file.filename)= file.filename
-            #stats(class=coverageClass(file.coverage))
-              .percentage #{file.coverage | 0}%
-              .sloc= file.sloc
+            .stats(class=coverageClass(file.coverage))
+              .percentage #{file.coverage | 0}% line coverage
+              .statements #{file.statements | 0}% statement coverage
+              .blocks #{file.blocks | 0}% block coverage
+              .sloc #{file.sloc} SLOC
               .hits= file.hits
               .misses= file.misses
 
-            table#source
-              thead
-                tr
-                  th Line
-                  th Hits
-                  th Source
-              tbody
-                for line, number in file.source
-                  if line.coverage > 0
-                    tr.hit
-                      td.line= number
-                      td.hits= line.coverage
-                      td.source= line.source
-                  else if 0 === line.coverage
-                    tr.miss
-                      td.line= number
-                      td.hits 0
-                      td.source= line.source
-                  else
-                    tr
-                      td.line= number
-                      td.hits
-                      td.source= line.source || ' '
+            div.table
+              table.source
+                thead
+                  tr
+                    th Line
+                    th Hits
+                    th Statements
+                    th Source
+                tbody
+                  for line, number in file.source
+                    if line.coverage > 0
+                      tr(class="hit #{line.statements.toFixed(0) != 100 ? 'partial' : ''}")
+                        td.line #{number + 1}
+                        td.hits= line.coverage
+                        td.statements #{line.statements.toFixed(0)}%
+                        td.source= line.source
+                    else if 0 === line.coverage
+                      tr.miss
+                        td.line #{number + 1}
+                        td.hits 0
+                        td.statements
+                        td.source= line.source
+                    else
+                      tr
+                        td.line #{number + 1}
+                        td.hits
+                        td.statements
+                        td.source= line.source || ' '
