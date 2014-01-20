@@ -125,5 +125,9 @@ describe('cover.js', function () {
         it('will return the correct count for lines that were not covered', function () {
             assert.equal(stats.lineDetails[7].count, 0);
         });
+        it('will return the correct count for lines that are blocks around other code', function () {
+            assert.equal(stats.lineDetails[0].count, 1);
+            assert.equal(stats.lineDetails[13].count, 1);
+        });
     });
 });
