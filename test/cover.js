@@ -122,6 +122,8 @@ describe('cover.js', function () {
             assert.equal(stats.lineDetails.length, 14);
             assert.equal(stats.lineDetails.filter(function(item){return item}).length, 9);
         });
-
+        it('will return the correct count for lines that were not covered', function () {
+            assert.equal(stats.lineDetails[7].count, 0);
+        });
     });
 });
