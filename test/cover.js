@@ -139,5 +139,13 @@ describe('cover.js', function () {
             assert.equal(stats.lineDetails[4].statementDetails[2].loc.end.line, 5);
             assert.equal(stats.lineDetails[4].statementDetails[2].loc.end.column, 27);
         });
+        it('will return the correct coverage count for the covered statements', function () {
+            assert.equal(stats.lineDetails[4].statementDetails[0].count, 11);
+            assert.equal(stats.lineDetails[4].statementDetails[2].count, 10);
+        });
+        it('will return the correct coverage count for the uncovered statements', function () {
+            assert.equal(stats.lineDetails[6].statementDetails[0].count, 0);
+            assert.equal(stats.lineDetails[6].statementDetails[2].count, 0);
+        });
     });
 });
