@@ -9,11 +9,10 @@ var multimatch = require('multimatch');
 // Coverage tracker
 function CoverageData (filename, instrumentor) {
     var theLines = {};
-    this.instrumentor = instrumentor;
-    this.filename = filename;
-    this.nodes = {};
-    this.visitedBlocks = {};
-    this.source = instrumentor.source;
+    /*
+     * Create a map between the lines and the nodes
+     * This is used later for calculating the code coverage stats
+     */
     Object.keys(instrumentor.nodes).forEach(function(index) {
         var node = instrumentor.nodes[index],
             lineStruct;
@@ -40,6 +39,11 @@ function CoverageData (filename, instrumentor) {
         }
     });
     this.lines = theLines;
+    this.instrumentor = instrumentor;
+    this.filename = filename;
+    this.nodes = {};
+    this.visitedBlocks = {};
+    this.source = instrumentor.source;
 }
 
 // Calculate node coverage statistics
