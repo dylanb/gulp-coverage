@@ -39,21 +39,10 @@ html
                     th Source
                 tbody
                   for line, number in file.source
-                    if line.coverage > 0
-                      tr(class="hit #{line.statements.toFixed(0) != 100 ? 'partial' : ''}")
-                        td.line #{number + 1}
-                        td.hits= line.coverage
-                        td.statements #{line.statements.toFixed(0)}%
-                        td.source= line.source
-                    else if 0 === line.coverage
-                      tr.miss
-                        td.line #{number + 1}
-                        td.hits 0
-                        td.statements
-                        td.source= line.source
-                    else
-                      tr
-                        td.line #{number + 1}
-                        td.hits
-                        td.statements
-                        td.source= line.source || ' '
+                    tr(class="#{ line.coverage === 0 ? 'miss' : line.statements ? 'hit ' + (line.statements.toFixed(0) != 100 ? 'partial' : '') :''}")
+                      td.line #{number + 1}
+                      td.hits #{line.coverage ? line.coverage : (line.coverage === 0 ? 0 : '')}
+                      td.statements #{line.coverage ? line.statements.toFixed(0) + '%' : ''}
+                      td.source
+                        for segment in line.segments
+                          span(class="statement #{segment.count ? '' : 'notok'}")= segment.code

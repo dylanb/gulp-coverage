@@ -342,14 +342,11 @@ tr.miss td.statements {
 tr.miss td {
   background: #f8d5d8;
 }
-tr.partial td.line,
-tr.partial td.hits,
-tr.partial td.statements {
-  background: rgba(65,131,196,0.2);
-}
-
-tr.partial td {
-  background: rgba(65,131,196,0.2);
+tr.partial td.source span.statement.notok {
+  padding: 3px;
+  margin: 3px;
+  background: #f8d5d8;
+  color: #000;
 }
 
 td.source {
