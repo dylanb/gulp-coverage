@@ -6,7 +6,14 @@ var vm = require('vm');
 var _ = require('underscore');
 var multimatch = require('multimatch');
 
-// Coverage tracker
+/**
+ * Class used to track the coverage data for a single source code file
+ *
+ * @class FileCoverageData
+ * @constructor
+ * @param {String} filename - the name of the file
+ * @param {Object} instrumentor - the object that will help with instrumentation
+ */
 function FileCoverageData (filename, instrumentor) {
     var theLines = {};
     /*
@@ -46,8 +53,14 @@ function FileCoverageData (filename, instrumentor) {
     this.source = instrumentor.source;
 }
 
-// Calculate node coverage statistics
-FileCoverageData.prototype.blocks = function() {
+/**
+ * calculate the block coverage stats
+ *
+ * @private
+ * @method _block
+ * @return {Object} - structure containing `total` and `seen` counts for the blocks
+ */
+FileCoverageData.prototype._blocks = function() {
     var totalBlocks = this.instrumentor.blockCounter;
     var numSeenBlocks = 0;
     for(var index in this.visitedBlocks) {
@@ -60,7 +73,14 @@ FileCoverageData.prototype.blocks = function() {
     return toReturn;
 };
 
-FileCoverageData.prototype.prepare = function() {
+/**
+ * read the instrumentation data from the store into memory
+ *
+ * @private
+ * @method _prepare
+ * @return {undefined}
+ */
+FileCoverageData.prototype._prepare = function() {
     var data = require('./coverage_store').getStoreData(this.filename),
         rawData, store, index;
 
@@ -132,7 +152,7 @@ FileCoverageData.prototype.prepare = function() {
  */
 
 FileCoverageData.prototype.stats = function() {
-    this.prepare();
+    this._prepare();
         var filedata = this.instrumentor.source.split('\n');
     var lineDetails = [],
         lines = 0, fileStatements = 0, fileSsoc = 0, fileSloc = 0,
@@ -173,7 +193,7 @@ FileCoverageData.prototype.stats = function() {
         fileSsoc += lineStruct.ssoc;
         lineDetails[index-1] = lineStruct;
     });
-    blockInfo = this.blocks();
+    blockInfo = this._blocks();
     retVal = {
         lines: lines,
         statements: fileStatements,
@@ -188,7 +208,18 @@ FileCoverageData.prototype.stats = function() {
 };
 
 
-
+/**
+ * Generate the header at the top of the instrumented file that sets up the data structures that
+ * are used to collect instrumentation data.
+ *
+ * @private
+ * @method addInstrumentationHeader
+ * @param {String} template - the contents of the template file
+ * @param {String} filename - the full path name of the file being instrumented
+ * @param {String} instrumented - the instrumented source code of the file
+ * @param {String} coverageStorePath - the path to the coverage store
+ * @return {String} the rendered file with instrumentation and instrumentation header
+ */
 var addInstrumentationHeader = function(template, filename, instrumented, coverageStorePath) {
     var templ = _.template(template),
         renderedSource = templ({
@@ -200,7 +231,12 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
     return renderedSource;
 };
 
-
+/**
+ * @class CoverageSession
+ * @constructor
+ * @param {Array[glob]} pattern - the array of glob patterns of includes and excludes
+ * @param {String} debugDirectory - the name of the director to contain debug instrumentation files
+ */
 var CoverageSession = function(pattern, debugDirectory) {
     function stripBOM(content) {
         // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
@@ -245,6 +281,11 @@ var CoverageSession = function(pattern, debugDirectory) {
     
 };
 
+/**
+ * Release the original require function
+ *
+ * @method release
+ */
 CoverageSession.prototype.release = function() {
   require.extensions['.js'] = this.originalRequire;
 };
@@ -350,16 +391,19 @@ CoverageSession.prototype.allStats = function () {
     return stats;
 };
 
+/**
+ * create a new CoverageSession object
+ *
+ * @method cover
+ * @param {Array[glob]} pattern - the array of glob patterns of includes and excludes
+ * @param {String} debugDirectory - the name of the director to contain debug instrumentation files
+ * @return {Object} the CoverageSession instance
+ */
 var cover = function(pattern, debugDirectory) {    
     return new CoverageSession(pattern, debugDirectory);
 };
 
 
-/**
- * This initializes a new coverage run. It does this by creating a randomly generated directory
- * in the .coverdata and updating the .coverrun file in the process' cwd with the directory's
- * name, so that the data collection can write data into this directory
- */
 function removeDir(dirName) {
     fs.readdirSync(dirName).forEach(function(name) {
         if (name !== '.' && name !== '..') {
@@ -369,6 +413,11 @@ function removeDir(dirName) {
     fs.rmdirSync(dirName);
 }
 
+/**
+ * This initializes a new coverage run. It does this by creating a randomly generated directory
+ * in the .coverdata and updating the .coverrun file in the process' cwd with the directory's
+ * name, so that the data collection can write data into this directory
+ */
 var init = function() {
     var directoryName = '.cover_' + Math.random().toString().substring(2),
         dataDir = process.cwd() + '/.coverdata';
