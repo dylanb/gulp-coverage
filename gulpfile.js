@@ -35,7 +35,7 @@ gulp.task('debug', function () {
  * these tasks are to actually use the plugin and test it within the context of gulp
  */
 gulp.task('blnkt', function () {
-    gulp.src(['src.js', 'src2.js', 'src3.js'], { read: false })
+    gulp.src(['src.js', 'src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
             debugDirectory: 'debug'
@@ -49,7 +49,7 @@ gulp.task('blnkt', function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch(['src.js', 'src2.js', 'src3.js', 'test.js', 'test2.js'], function(event) {
+    gulp.watch(['src.js', 'src3.js', 'test.js', 'test2.js'], function(event) {
       gulp.run('blnkt');
     });    
 });

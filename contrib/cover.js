@@ -187,6 +187,8 @@ CoverageData.prototype.stats = function() {
     return retVal;
 };
 
+
+
 var addInstrumentationHeader = function(template, filename, instrumented, coverageStorePath) {
     var templ = _.template(template),
         renderedSource = templ({
@@ -198,24 +200,22 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
     return renderedSource;
 };
 
-var stripBOM = function(content) {
-    // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
-    // because the buffer-to-string conversion in `fs.readFileSync()`
-    // translates it to FEFF, the UTF-16 BOM.
-    if (content.charCodeAt(0) === 0xFEFF) {
-        content = content.slice(1);
+
+var Coverage = function(pattern, debugDirectory) {
+    function stripBOM(content) {
+        // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+        // because the buffer-to-string conversion in `fs.readFileSync()`
+        // translates it to FEFF, the UTF-16 BOM.
+        if (content.charCodeAt(0) === 0xFEFF) {
+            content = content.slice(1);
+        }
+        return content;
     }
-    return content;
-};
-
-var cover = function(pattern, debugDirectory) {    
-    var originalRequire = require.extensions['.js'];
-    var coverageData = {};
-
+    var originalRequire = this.originalRequire = require.extensions['.js'];
+    var coverageData = this.coverageData = {};
     var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js").replace(/\\/g, "/");
     var templatePath = path.resolve(path.resolve(__dirname), "templates", "instrumentation_header.js");
     var template = fs.readFileSync(templatePath, 'utf-8');
-
     require.extensions['.js'] = function(module, filename) {
         filename = filename.replace(/\\/g, "/");
 
@@ -243,18 +243,75 @@ var cover = function(pattern, debugDirectory) {
         return module._compile(newCode, filename);
     };
     
-    // Setup the data retrieval and release functions
-    var coverage = function(ready) {
-      ready(coverageData);
-    };
-    
-    coverage.release = function() {
-      require.extensions['.js'] = originalRequire;
-    };
-    
-    coverage.coverageData = coverageData;
-    
-    return coverage;
+};
+
+Coverage.prototype.release = function() {
+  require.extensions['.js'] = this.originalRequire;
+};
+
+Coverage.prototype.allStats = function () {
+    var stats = { files : []},
+        filename, item, lines, sourceArray, segments,
+        totSloc, totCovered, totBloc, totStat, totStatCovered, totBlocCovered,
+        coverageData = this.coverageData;
+
+    totSloc = totCovered = totBloc = totStat = totStatCovered = totBlocCovered = 0;
+    Object.keys(coverageData).forEach(function(filename) {
+        var fstats, lines, code;
+
+        fstats = coverageData[filename].stats();
+        lines = fstats.lineDetails;
+        code = fstats.code;
+        sourceArray = [];
+        code.forEach(function(codeLine, index){
+            var count = null, statements = null, numStatements = 0, missedRanges = [];
+            line = lines[index];
+            if (line) {
+                count = line.count;
+                statements = 0;
+                line.statementDetails.forEach(function(statement) {
+                    numStatements += 1;
+                    if (statement.count) {
+                        statements += 1;
+                    }
+                });
+            }
+            sourceArray.push({
+                coverage: count,
+                statements: statements === null ? null : (statements / numStatements) * 100,
+                source: codeLine
+            });
+        });
+        segments = filename.split('/');
+        item = {
+            filename: filename,
+            basename: segments.pop(),
+            segments: segments.join('/') + '/',
+            coverage: (fstats.lines / fstats.sloc) * 100,
+            statements: (fstats.statements / fstats.ssoc) * 100,
+            blocks: (fstats.blocks / fstats.sboc) * 100,
+            source: sourceArray,
+            sloc: fstats.sloc
+        };
+        totStat += fstats.ssoc;
+        totBloc += fstats.sboc;
+        totSloc += fstats.sloc;
+        totCovered += fstats.lines;
+        totStatCovered += fstats.statements;
+        totBlocCovered += fstats.blocks;
+        stats.files.push(item);
+    });
+    stats.sloc = totSloc;
+    stats.ssoc = totStat;
+    stats.sboc = totBloc;
+    stats.coverage = totCovered / totSloc * 100;
+    stats.statements = totStatCovered / totStat * 100;
+    stats.blocks = totBlocCovered / totBloc * 100;
+    return stats;
+};
+
+var cover = function(pattern, debugDirectory) {    
+    return new Coverage(pattern, debugDirectory);
 };
 
 
