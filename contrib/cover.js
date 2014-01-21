@@ -7,7 +7,7 @@ var _ = require('underscore');
 var multimatch = require('multimatch');
 
 // Coverage tracker
-function CoverageData (filename, instrumentor) {
+function FileCoverageData (filename, instrumentor) {
     var theLines = {};
     /*
      * Create a map between the lines and the nodes
@@ -47,7 +47,7 @@ function CoverageData (filename, instrumentor) {
 }
 
 // Calculate node coverage statistics
-CoverageData.prototype.blocks = function() {
+FileCoverageData.prototype.blocks = function() {
     var totalBlocks = this.instrumentor.blockCounter;
     var numSeenBlocks = 0;
     for(var index in this.visitedBlocks) {
@@ -60,7 +60,7 @@ CoverageData.prototype.blocks = function() {
     return toReturn;
 };
 
-CoverageData.prototype.prepare = function() {
+FileCoverageData.prototype.prepare = function() {
     var data = require('./coverage_store').getStoreData(this.filename),
         rawData, store, index;
 
@@ -131,7 +131,7 @@ CoverageData.prototype.prepare = function() {
  *
  */
 
-CoverageData.prototype.stats = function() {
+FileCoverageData.prototype.stats = function() {
     this.prepare();
         var filedata = this.instrumentor.source.split('\n');
     var lineDetails = [],
@@ -231,7 +231,7 @@ var Coverage = function(pattern, debugDirectory) {
         data = data.replace(/^\#\!.*/, '');
 
         var instrumented = instrument(data);
-        coverageData[filename] = new CoverageData(filename, instrumented);
+        coverageData[filename] = new FileCoverageData(filename, instrumented);
 
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
 
@@ -249,6 +249,44 @@ Coverage.prototype.release = function() {
   require.extensions['.js'] = this.originalRequire;
 };
 
+/**
+ * Generate a coverage statistics structure for all of the instrumented files given all the data that
+ * has been geenrated for them to date
+ * {
+ *        sloc: Integer - how many source lines of code there were in total
+ *        ssoc: Integer - how many statements of code there were in total
+ *        sboc: Integer - how many blocks of code there were in total
+ *        coverage: Float - percentage of lines covered
+ *        statements: Float - percentage of statements covered
+ *        blocks: Float: percentage of blocks covered
+ *        files: Array[Object] - array of information about each file
+ * }
+ *
+ * Each file has the following structure
+ * {
+ *        filename: String - the file
+ *        basename: String - the file short name
+ *        segments: String - the file's directory
+ *        coverage: Float - the percentage of lines covered
+ *        statements: Float - the percentage of statements covered
+ *        blocks: Float - the percentage of blocks covered
+ *        source: Array[Object] - array of objects, one for each line of code
+ *        sloc: Integer - the number of lines of code
+ *        ssoc: Integer - the number of statements of code
+ *        sboc: Integer - the number of blocks of code
+ * }
+ *
+ * Each line has the following structure
+ * {
+ *        count: Integer - number of times the line was hit
+ *        statements: Float - the percentage of statements covered
+ *        source: String - the line of code
+ * }  
+ *
+ * @method allStats
+ * @return {Object} - the structure containing all the coverage stats for the coverage instance
+ *
+ */
 Coverage.prototype.allStats = function () {
     var stats = { files : []},
         filename, item, lines, sourceArray, segments,
@@ -291,7 +329,9 @@ Coverage.prototype.allStats = function () {
             statements: (fstats.statements / fstats.ssoc) * 100,
             blocks: (fstats.blocks / fstats.sboc) * 100,
             source: sourceArray,
-            sloc: fstats.sloc
+            sloc: fstats.sloc,
+            sboc: fstats.sboc,
+            ssoc: fstats.ssoc
         };
         totStat += fstats.ssoc;
         totBloc += fstats.sboc;
