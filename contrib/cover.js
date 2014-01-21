@@ -201,7 +201,7 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
 };
 
 
-var Coverage = function(pattern, debugDirectory) {
+var CoverageSession = function(pattern, debugDirectory) {
     function stripBOM(content) {
         // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
         // because the buffer-to-string conversion in `fs.readFileSync()`
@@ -245,7 +245,7 @@ var Coverage = function(pattern, debugDirectory) {
     
 };
 
-Coverage.prototype.release = function() {
+CoverageSession.prototype.release = function() {
   require.extensions['.js'] = this.originalRequire;
 };
 
@@ -287,7 +287,7 @@ Coverage.prototype.release = function() {
  * @return {Object} - the structure containing all the coverage stats for the coverage instance
  *
  */
-Coverage.prototype.allStats = function () {
+CoverageSession.prototype.allStats = function () {
     var stats = { files : []},
         filename, item, lines, sourceArray, segments,
         totSloc, totCovered, totBloc, totStat, totStatCovered, totBlocCovered,
@@ -351,7 +351,7 @@ Coverage.prototype.allStats = function () {
 };
 
 var cover = function(pattern, debugDirectory) {    
-    return new Coverage(pattern, debugDirectory);
+    return new CoverageSession(pattern, debugDirectory);
 };
 
 
