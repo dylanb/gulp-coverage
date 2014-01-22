@@ -4,7 +4,13 @@ Gulp coverage reporting for Node.js that is independent of the test runner
 
 #Report
 
-![Example Report](./screenshots/gulp-coverage.png "Example Report")
+gulp-coverage generates block, line and statement coverage for Node.js JavaScript files. This is equivalent to function, statement, branch and "modified condition/decision" coverage, where a "statement" is equivalent to a "modified condition/decision". The HTML report gives summary information for the block, line and statement covereage across all the files as well as for each file.
+
+For each file, a chain of links is built allowing you to click through from the summary to the first and then all subsequent instances of each type of miss (line misses and statement misses).
+
+![Example Report Showing missed lines, missed statements and chains of links](./screenshots/gulp-coverage.png "Example Report")
+
+The report format has been desiged to be accessible and conformant with WCAG 2 Level AA.
 
 #Example
 
