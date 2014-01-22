@@ -1,6 +1,6 @@
 {
   "name": "gulp-coverage",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
