@@ -23,7 +23,15 @@ html
             h2(id=file.filename)= file.filename
             .stats(class=coverageClass(file.coverage))
               .percentage #{file.coverage | 0}% line coverage
+                if file.coverage < 100
+                  a(href="#miss0")
+                    = ' go '
+                    span.offscreen jump to first missed line
               .statements #{file.statements | 0}% statement coverage
+                if file.statements < 100
+                  a(href="#partial0")
+                    = ' go '
+                    span.offscreen jump to first missed statement
               .blocks #{file.blocks | 0}% block coverage
               .sloc #{file.sloc} SLOC
               .hits= file.hits
@@ -37,9 +45,10 @@ html
                     th Hits
                     th Statements
                     th Source
+                    th Action
                 tbody
                   for line, number in file.source
-                    tr(class="#{ line.coverage === 0 ? 'miss' : line.statements ? 'hit ' + (line.statements.toFixed(0) != 100 ? 'partial' : '') :''}")
+                    tr(class=coverageCategory(line))
                       td.line #{number + 1}
                       td.hits #{line.coverage ? line.coverage : (line.coverage === 0 ? 0 : '')}
                       td.statements #{line.coverage ? line.statements.toFixed(0) + '%' : ''}
@@ -49,3 +58,4 @@ html
                             if !segment.count
                               span.offscreen= ' not covered '
                             = segment.code
+                      td.action

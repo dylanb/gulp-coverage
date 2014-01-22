@@ -17,13 +17,22 @@ function HTMLCov (coverageData, filename) {
 		fn = jade.compile(str, { filename: file }),
 		output = fn({
 			cov: coverageData,
-			coverageClass: coverageClass
+			coverageClass: coverageClass,
+			coverageCategory: coverageCategory
 		});
 	if (!filename) {
 		process.stdout.write();
 	} else {
 		fs.writeFileSync(filename, output);
 	}
+}
+
+function coverageCategory(line) {
+	return line.coverage === 0 ?
+				'miss' :
+				(line.statements ?
+					'hit ' + (line.statements.toFixed(0) != 100 ? 'partial' : '')
+					: '');
 }
 
 function coverageClass (n) {

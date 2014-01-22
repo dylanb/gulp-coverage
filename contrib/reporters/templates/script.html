@@ -1,3 +1,4 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>
 
 headings = [];
@@ -31,4 +32,18 @@ function find(y) {
     }
   }
 }
+jQuery(document).ready(function() {
+  jQuery(['partial', 'miss']).each(function(i, clss) {
+    var $els = jQuery('.'+clss);
+    $els.each(function(index, item) {
+      var $this = jQuery(item).attr('id', clss + index);
+      if (index < $els.length - 1) {
+        $this.find('.action').append(
+          jQuery('<a>').attr('href', '#' + clss + (index + 1))
+            .text('next')
+        );
+      }
+    });
+  });
+});
 </script>
