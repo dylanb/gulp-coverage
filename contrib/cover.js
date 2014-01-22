@@ -609,6 +609,7 @@ module.exports = {
     init: init,
     cleanup: cleanup,
     reporters: {
-        html:   require('./reporters/html')
+        html:   require('./reporters/html'),
+        json:   require('./reporters/json')
     }
 };
