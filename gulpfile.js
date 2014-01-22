@@ -5,18 +5,6 @@ var gulp = require('gulp'),
     exec = require('child_process').exec,
     jasmine = require('gulp-jasmine');
 
-gulp.task('jasmine', function () {
-    gulp.src('srcjasmine.js')
-        .pipe(cover.instrument({
-            pattern: ['**/test*'],
-            debugDirectory: 'debug'
-        }))
-        .pipe(jasmine())
-        .pipe(cover.report({
-            outFile: 'jasmine.html'
-        }));
-});
-
 gulp.task('test', function () {
     gulp.src(['test/**.js'], { read: false })
         .pipe(mocha({
@@ -46,7 +34,7 @@ gulp.task('debug', function () {
 /*
  * these tasks are to actually use the plugin and test it within the context of gulp
  */
-gulp.task('blnkt', function () {
+gulp.task('mocha', function () {
     gulp.src(['src.js', 'src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
@@ -60,9 +48,35 @@ gulp.task('blnkt', function () {
         }));
 });
 
+gulp.task('json', function () {
+    gulp.src(['src.js', 'src3.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['**/test*']
+        }))
+        .pipe(mocha({
+            reporter: 'spec'
+        }))
+        .pipe(cover.report({
+            reporter: 'json',
+            outFile: 'json.json'
+        }));
+});
+
+gulp.task('jasmine', function () {
+    gulp.src('srcjasmine.js')
+        .pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: 'debug'
+        }))
+        .pipe(jasmine())
+        .pipe(cover.report({
+            outFile: 'jasmine.html'
+        }));
+});
+
 gulp.task('watch', function () {
     gulp.watch(['src.js', 'src3.js', 'test.js', 'test2.js'], function(event) {
-      gulp.run('blnkt');
+      gulp.run('mocha');
     });    
 });
 
