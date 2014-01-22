@@ -1,6 +1,6 @@
 {
   "name": "gulp-coverage",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
@@ -13,14 +13,15 @@
     "through2": "~0.4.0"
   },
   "devDependencies": {
-    "gulp": "~3.4.1",
     "gulp-mocha": "~0.4.0",
-    "gulp-jshint": "~1.3.4"
+    "gulp-jshint": "~1.3.4",
+    "gulp-jasmine": "~0.1.2",
+    "gulp": "~3.4.0"
   },
   "keywords": [
     "Code Coverage",
     "Mocha",
-    "Jasmin",
+    "Jasmine",
     "gulpplugin"
   ],
   "author": "dylan@barrell.com",
