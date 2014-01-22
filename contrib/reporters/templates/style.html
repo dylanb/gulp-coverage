@@ -336,17 +336,18 @@ table td.hits {
 tr.miss td.line,
 tr.miss td.hits,
 tr.miss td.statements {
-  background: #e6c3c7;
+  background: rgba(107, 0 ,1, 0.75);
 }
 
 tr.miss td {
-  background: #f8d5d8;
+  background: rgba(107, 0 ,1, 0.75);
+  color: #fff;
 }
 tr.partial td.source span.statement.notok {
   padding: 3px;
   margin: 3px;
-  background: #f8d5d8;
-  color: #000;
+  background: rgba(107, 0 ,1, 0.75);
+  color: #fff;
 }
 
 td.source {
@@ -361,4 +362,17 @@ code .init { color: #2F6FAD }
 code .string { color: #5890AD }
 code .keyword { color: #8A6343 }
 code .number { color: #2F6FAD }
+
+.offscreen {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    width: 1px;
+    position: absolute;
+}
+
 </style>

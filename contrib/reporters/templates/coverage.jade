@@ -45,4 +45,7 @@ html
                       td.statements #{line.coverage ? line.statements.toFixed(0) + '%' : ''}
                       td.source
                         for segment in line.segments
-                          span(class="statement #{segment.count ? '' : 'notok'}")= segment.code
+                          span(class="statement #{segment.count ? '' : 'notok'}")
+                            if !segment.count
+                              span.offscreen= ' not covered '
+                            = segment.code
