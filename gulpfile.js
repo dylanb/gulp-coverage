@@ -2,8 +2,20 @@ var gulp = require('gulp'),
     cover = require('./index'),
     mocha = require('gulp-mocha'),
     jshint = require('gulp-jshint'),
-    exec = require('child_process').exec;
+    exec = require('child_process').exec,
+    jasmine = require('gulp-jasmine');
 
+gulp.task('jasmine', function () {
+    gulp.src('srcjasmine.js')
+        .pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: 'debug'
+        }))
+        .pipe(jasmine())
+        .pipe(cover.report({
+            outFile: 'jasmine.html'
+        }));
+});
 
 gulp.task('test', function () {
     gulp.src(['test/**.js'], { read: false })

@@ -6,6 +6,7 @@ Gulp coverage reporting for Node.js that is independent of the test runner
 
 To instrument and report on a file using Mocha as your test runner:
 
+    mocha = require('gulp-mocha');
     cover = require('gulp-coverage');
 
     gulp.task('test', function () {
@@ -20,6 +21,24 @@ To instrument and report on a file using Mocha as your test runner:
                 outFile: 'coverage.html'
             }));
     });
+
+To instrument and report using Jasmine as your test system:
+
+    jasmine = require('gulp-jasmine');
+    cover = require('gulp-coverage');
+
+    gulp.task('jasmine', function () {
+        gulp.src('srcjasmine.js')
+            .pipe(cover.instrument({
+                pattern: ['**/test*'],
+                debugDirectory: 'debug'
+            }))
+            .pipe(jasmine())
+            .pipe(cover.report({
+                outFile: 'jasmine.html'
+            }));
+    });
+
 
 ## Instrument
 
