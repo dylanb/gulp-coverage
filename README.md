@@ -2,6 +2,10 @@
 
 Gulp coverage reporting for Node.js that is independent of the test runner
 
+#Report
+
+![Example Report](./screenshots/gulp-coverage.png "Example Report")
+
 #Example
 
 To instrument and report on a file using Mocha as your test runner:
