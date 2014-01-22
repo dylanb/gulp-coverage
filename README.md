@@ -8,7 +8,7 @@ gulp-coverage generates block, line and statement coverage for Node.js JavaScrip
 
 For each file, a chain of links is built allowing you to click through from the summary to the first and then all subsequent instances of each type of miss (line misses and statement misses).
 
-![Example Report Showing missed lines, missed statements and chains of links](./screenshots/gulp-coverage.png "Example Report")
+![Example Report Showing missed lines, missed statements and chains of links](https://github.com/dylanb/gulp-coverage/raw/master/screenshots/gulp-coverage.png "Example Report")
 
 The report format has been desiged to be accessible and conformant with WCAG 2 Level AA.
 
