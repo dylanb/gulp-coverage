@@ -68,5 +68,5 @@ This will generate the reports for the instrumented files and can only be called
 
 `outFile` - the name of the file into which the report output will be written
 
-`reporter` - defaults to 'html' - this is the name of the reporter to use. Currently only the HTML reporter is available.
+`reporter` - defaults to 'html' - this is the name of the reporter to use. Currently there are an HTML reporter ('html') and a JSON ('json') reporter.
 
