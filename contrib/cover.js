@@ -5,6 +5,7 @@ var fs = require('fs');
 var vm = require('vm');
 var _ = require('underscore');
 var multimatch = require('multimatch');
+var extend = require('extend');
 
 /**
  * Class used to track the coverage data for a single source code file
@@ -167,6 +168,7 @@ FileCoverageData.prototype.stats = function() {
             ssoc = 0,
             statementDetails = [];
         line.nodes.forEach(function(node) {
+            var loc;
             if (node.count === null || node.count === undefined) {
                 node.count = 0;
             }
@@ -175,8 +177,10 @@ FileCoverageData.prototype.stats = function() {
             if (node.count) {
                 statements += 1;
             }
+            loc = {}
+            extend(loc, node.loc);
             statementDetails.push({
-                loc: node.loc,
+                loc: loc,
                 count: node.count
             });
         });
@@ -290,6 +294,292 @@ CoverageSession.prototype.release = function() {
   require.extensions['.js'] = this.originalRequire;
 };
 
+
+function getSegments(code, lines, count, statementDetails) {
+    var lengths = [], beginLine = code.length+1, endLine = 0, sd = [],
+        linesCode, i, j, k, splintered, segments;
+    // calculate the lengths of each line
+    code.forEach(function (codeLine) {
+        lengths.push(codeLine.length);
+    });
+    // work out which lines we are talking about
+    statementDetails.forEach(function(item) {
+        if (item.loc.start.line < beginLine) {
+            beginLine = item.loc.start.line;
+        }
+        if (item.loc.end.line > endLine) {
+            endLine = item.loc.end.line;
+        }
+    });
+    // modify all the coordinates into a single number
+    statementDetails.forEach(function(item) {
+        var lineNo = beginLine,
+            startOff = 0;
+        while (item.loc.start.line > lineNo) {
+            startOff += lengths[lineNo] + 1;
+            lineNo += 1;
+        }
+        startOff += item.loc.start.column;
+        endOff = 0;
+        lineNo = beginLine
+        while (item.loc.end.line > lineNo) {
+            endOff += lengths[lineNo] + 1;
+            lineNo += 1;
+        }
+        endOff += item.loc.end.column;
+        sd.push({
+            start: startOff,
+            end: endOff,
+            count: item.count
+        });
+    });
+    linesCode = code.filter(function(item, index) {
+        return (index >= beginLine-1 && index <= endLine-1);
+    }).join('\n');
+
+    // push on a synthetic segment to catch all the parts of the line(s)
+    sd.push({
+        start: 0,
+        end: linesCode.length,
+        count: count
+    });
+
+    // reconcile the overlapping segments
+    sd.sort(function(a, b) {
+        return (a.end - b.end);
+    });
+    sd.sort(function(a, b) {
+        return (a.start - b.start);
+    });
+    // Will now be sorted in start order with end as the second sort criterium
+    splintered = [];
+    for ( i = 0; i < sd.length; i++) {
+        var us = new Array(sd[i].end - sd[i].start + 1);
+        for (k = sd[i].end - sd[i].start; k >= 0; k--) {
+            us[k] = 1;                
+        }
+        for (j = 0; j < sd.length; j++) {
+            if (j !== i) {
+                if (sd[i].start <= sd[j].start && sd[i].end >= sd[j].end && 
+                    (sd[i].count !== sd[j].count || !sd[i].count || !sd[j].count)) {
+                    for ( k = sd[j].start; k <= sd[j].end; k++) {
+                        us[k - sd[i].start] = 0;
+                    }
+                }
+            }
+        }
+        if (us.indexOf(0) !== -1) {
+            // needs to be split
+            splitStart = undefined;
+            splitEnd = undefined;
+            for (k = 0; k < us.length; k++) {
+                if (us[k] === 1 && splitStart === undefined) {
+                    splitStart = k;
+                } else if (us[k] === 0 && splitStart !== undefined) {
+                    splitEnd = k - 1;
+                    splintered.push({
+                        start: splitStart + sd[i].start,
+                        end: splitEnd + sd[i].start,
+                        count: sd[i].count
+                    });
+                    splitStart = undefined;
+                }
+            }
+            if (splitStart !== undefined) {
+                splintered.push({
+                    start: splitStart + sd[i].start,
+                    end: k - 1 + sd[i].start,
+                    count: sd[i].count
+                });
+            }
+        } else {
+            splintered.push(sd[i]);
+        }
+    }
+    splintered.sort(function(a, b) {
+        return (b.end - a.end);
+    });
+    splintered.sort(function(a, b) {
+        return (a.start - b.start);
+    });
+    var combined = [splintered[0]];
+    splintered.reduce(function(p, c) {
+        if (p && p.start <= c.start && p.end >= c.end &&
+            (p.count === c.count || (p.count && c.count))) {
+            // Can get rid of c
+            return p;
+        } else {
+            combined.push(c);
+            return c
+        }
+    });
+    // combine adjacent segments
+    currentItem = {
+        start: combined[0].start,
+        end: combined[0].end,
+        count: combined[0].count
+    };
+    segments = [];
+    combined.splice(0,1);
+    combined.forEach(function(item) {
+        if (item.count === currentItem.count || (item.count && currentItem.count)) {
+            currentItem.end = item.end;
+        } else {
+            segments.push(currentItem);
+            currentItem = {
+                start: item.start,
+                end: item.end,
+                count: item.count
+            };
+        }
+    });
+    segments.push(currentItem);
+    // Now add the code to each segment
+    segments.forEach(function(item) {
+        item.code = linesCode.substring(item.start, item.end);
+    });
+    return segments;
+}
+
+function splitOverlaps(lines, code) {
+    var i, j, left, right, insertAt;
+
+    for ( i = 0; i < lines.length; i++) {
+        if (lines[i]) {
+            for (j = lines[i].statementDetails.length; j--;) {
+                if (lines[i].statementDetails[j].loc.start.line < i+1) {
+                    if (lines[i].statementDetails[j].loc.end.line >= i+1) {
+                        lines[i].statementDetails[j].loc.start.line = i+1;
+                        lines[i].statementDetails[j].loc.start.column = 0;
+                    } else {
+                        lines[i].statementDetails.splice(j, 1);
+                    }
+                }            
+            }
+            if (lines[i].statementDetails[0].loc.start.column) {
+                lines[i].statementDetails[0].loc.start.column = 0;
+            }
+            for (j = i + 1; j < lines.length; j++) {
+                if (lines[i] && lines[j]) {
+                    left = {
+                        start: undefined,
+                        end: undefined
+                    };
+                    right = {
+                        start: undefined,
+                        end: undefined
+                    };
+                    lines[i].statementDetails.forEach(function(item, index) {
+                        if (left.start === undefined) {
+                            left.start = item.loc.start.line;
+                        }
+                        if (left.end === undefined) {
+                            left.end = item.loc.end.line;
+                        } else {
+                            left.end = Math.max(left.end, item.loc.end.line);
+                        }
+                    });
+                    lines[j].statementDetails.forEach(function(item) {
+                        if (right.start === undefined) {
+                            right.start = item.loc.start.line;
+                        }
+                        if (right.end === undefined) {
+                            right.end = item.loc.end.line;
+                        } else {
+                            right.end = Math.max(right.end, item.loc.end.line);
+                        }
+                    });
+                }
+                if (i !== j &&
+                    lines[i] && lines[j] && left.start <= right.start && left.end >= right.end) {
+                    // lines[i].statementDetails = lines[i].statementDetails.filter(function(item) {
+                    //     return item.loc.start.line === lines[i].statementDetails[0].loc.start.line;
+                    // });
+                    if (left.start === right.start && left.end <= right.end) {
+                        lines[j] = undefined;
+                    } else {
+                        lines[i].statementDetails.forEach(function(item, index) {
+                            if (item.loc.start.line !== item.loc.end.line) {
+                                if (i > j || left.start === right.start) {
+                                    lines[i] = undefined;
+                                }
+                                if (item.loc.end.line > right.end) {
+                                    // need to split it
+                                    insertAt = right.end+1;
+                                    while (lines[insertAt-1] && insertAt <= left.end) {
+                                        insertAt += 1;
+                                    }
+                                    if (insertAt <= left.end) {
+                                        lines[insertAt-1] = {
+                                            number: (insertAt).toString(),
+                                            count: undefined,
+                                            statementDetails: [{
+                                                loc: {
+                                                    start: {
+                                                        line: insertAt,
+                                                        column: 0
+                                                    },
+                                                    end: {
+                                                        line: item.loc.end.line,
+                                                        column: item.loc.end.column
+                                                    }
+                                                }
+                                            }]
+                                        };
+                                    }
+                                }
+                                if (i < j && left.start !== right.start) {
+                                    item.loc.end.line = right.start - 1;
+                                    item.loc.end.column = code[item.loc.start.line-1].length;
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            lines[i] = undefined;
+        }
+    }
+    for (j = lines.length; j--;) {
+        if (!lines[j]) {
+            lines[j] = undefined;
+        } else {
+            if (lines[j].statementDetails[0].loc.start.column === 0 &&
+                lines[j].statementDetails[0].loc.end.column === 0) {
+                lines[j] = undefined;
+            }
+        }
+    }
+    return lines;
+}
+
+function linesWithData(lines) {
+    var interim = [],
+        unique, i;
+    lines.forEach(function(item, index) {
+        if (item) {
+            item.statementDetails.forEach(function(statement) {
+                for (i = statement.loc.start.line; i <= statement.loc.end.line; i++) {
+                    interim.push(i);
+                }
+            });
+        }
+    });
+    interim.sort(function(a,b) {return a - b});
+    unique = [interim[0]];
+    interim.reduce(function(p, c) {
+        if (p === c) {
+            // Can get rid of c
+            return p;
+        } else {
+            unique.push(c);
+            return c
+        }
+    });
+    return unique;
+}
+
 /**
  * Generate a coverage statistics structure for all of the instrumented files given all the data that
  * has been geenrated for them to date
@@ -321,159 +611,20 @@ CoverageSession.prototype.release = function() {
  * {
  *        count: Integer - number of times the line was hit
  *        statements: Float - the percentage of statements covered
- *        source: String - the line of code
+ *        segments: Array[Object] - the segments of statements that make up the line
  * }  
+ *
+ * Each statement segment has the following structure
+ * {
+ *      code: String - the string of code for the segment
+ *      count: Integer - the hit count for the segment
+ * }
  *
  * @method allStats
  * @return {Object} - the structure containing all the coverage stats for the coverage instance
  *
  */
 CoverageSession.prototype.allStats = function () {
-    function getSegments(code, lines, count, statementDetails) {
-        var lengths = [], beginLine = code.length+1, endLine = 0, sd = [],
-            linesCode, i, j, k, splintered, segments;
-        // calculate the lengths of each line
-        code.forEach(function (codeLine) {
-            lengths.push(codeLine.length);
-        });
-        // work out which lines we are talking about
-        statementDetails.forEach(function(item) {
-            if (item.loc.start.line < beginLine) {
-                beginLine = item.loc.start.line;
-            }
-            if (item.loc.end.line > endLine) {
-                endLine = item.loc.end.line;
-            }
-        });
-        // modify all the coordinates into a single number
-        statementDetails.forEach(function(item) {
-            var lineNo = beginLine,
-                startOff = 0;
-            while (item.loc.start.line > lineNo) {
-                startOff += lengths[lineNo] + 1;
-                lineNo += 1;
-            }
-            startOff += item.loc.start.column;
-            endOff = 0;
-            lineNo = beginLine
-            while (item.loc.end.line > lineNo) {
-                endOff += lengths[lineNo] + 1;
-                lineNo += 1;
-            }
-            endOff += item.loc.end.column;
-            sd.push({
-                start: startOff,
-                end: endOff,
-                count: item.count
-            });
-        });
-        linesCode = code.filter(function(item, index) {
-            return (index >= beginLine-1 && index <= endLine-1);
-        }).join('\n');
-
-        // push on a synthetic segment to catch all the parts of the line(s)
-        sd.push({
-            start: 0,
-            end: linesCode.length - 1,
-            count: count
-        });
-
-        // reconcile the overlapping segments
-        sd.sort(function(a, b) {
-            return (a.end - b.end);
-        });
-        sd.sort(function(a, b) {
-            return (a.start - b.start);
-        });
-        // Will now be sorted in start order with end as the second sort criterium
-        splintered = [];
-        for ( i = 0; i < sd.length; i++) {
-            var us = new Array(sd[i].end - sd[i].start + 1);
-            for (k = sd[i].end - sd[i].start; k >= 0; k--) {
-                us[k] = 1;                
-            }
-            for (j = 0; j < sd.length; j++) {
-                if (j !== i) {
-                    if (sd[i].start <= sd[j].start && sd[i].end >= sd[j].end && 
-                        (sd[i].count !== sd[j].count || !sd[i].count || !sd[j].count)) {
-                        for ( k = sd[j].start; k <= sd[j].end; k++) {
-                            us[k - sd[i].start] = 0;
-                        }
-                    }
-                }
-            }
-            if (us.indexOf(0) !== -1) {
-                // needs to be split
-                splitStart = undefined;
-                splitEnd = undefined;
-                for (k = 0; k < us.length; k++) {
-                    if (us[k] === 1 && splitStart === undefined) {
-                        splitStart = k;
-                    } else if (us[k] === 0 && splitStart !== undefined) {
-                        splitEnd = k - 1;
-                        splintered.push({
-                            start: splitStart + sd[i].start,
-                            end: splitEnd + sd[i].start,
-                            count: sd[i].count
-                        });
-                        splitStart = undefined;
-                    }
-                }
-                if (splitStart !== undefined) {
-                    splintered.push({
-                        start: splitStart + sd[i].start,
-                        end: k - 1 + sd[i].start,
-                        count: sd[i].count
-                    });
-                }
-            } else {
-                splintered.push(sd[i]);
-            }
-        }
-        splintered.sort(function(a, b) {
-            return (b.end - a.end);
-        });
-        splintered.sort(function(a, b) {
-            return (a.start - b.start);
-        });
-        var combined = [splintered[0]];
-        splintered.reduce(function(p, c) {
-            if (p && p.start <= c.start && p.end >= c.end &&
-                (p.count === c.count || (p.count && c.count))) {
-                // Can get rid of c
-                return p;
-            } else {
-                combined.push(c);
-                return c
-            }
-        });
-        // combine adjacent segments
-        currentItem = {
-            start: combined[0].start,
-            end: combined[0].end,
-            count: combined[0].count
-        };
-        segments = [];
-        combined.splice(0,1);
-        combined.forEach(function(item) {
-            if (item.count === currentItem.count || (item.count && currentItem.count)) {
-                currentItem.end = item.end;
-            } else {
-                segments.push(currentItem);
-                currentItem = {
-                    start: item.start,
-                    end: item.end,
-                    count: item.count
-                };
-            }
-        });
-        segments.push(currentItem);
-        // Now add the code to each segment
-        segments.forEach(function(item) {
-            item.code = linesCode.substring(item.start, item.end);
-        });
-        return segments;
-    }
     var stats = { files : []},
         filename, item, lines, sourceArray, segments,
         totSloc, totCovered, totBloc, totStat, totStatCovered, totBlocCovered,
@@ -481,11 +632,13 @@ CoverageSession.prototype.allStats = function () {
 
     totSloc = totCovered = totBloc = totStat = totStatCovered = totBlocCovered = 0;
     Object.keys(coverageData).forEach(function(filename) {
-        var fstats, lines, code;
+        var fstats, lines, code, dataLines;
 
         fstats = coverageData[filename].stats();
-        lines = fstats.lineDetails;
         code = fstats.code;
+        splitOverlaps(fstats.lineDetails, code);
+        dataLines = linesWithData(fstats.lineDetails);
+        lines = fstats.lineDetails;
         sourceArray = [];
         code.forEach(function(codeLine, index){
             var count = null, statements = null, numStatements = 0, segs, lineNo, allSame = true, lineStruct;
@@ -503,7 +656,7 @@ CoverageSession.prototype.allStats = function () {
                         allSame = false;
                     }
                 });
-                if (allSame && count) {
+                if (count) {
                     segs = getSegments(code, lines, count, line.statementDetails);
                 } else {
                     segs = [{
@@ -511,11 +664,13 @@ CoverageSession.prototype.allStats = function () {
                         count: count
                     }];
                 }
-            } else {
+            } else if (dataLines.indexOf(index+1) === -1) {
                 segs = [{
                     code: codeLine,
                     count: 0
                 }];
+            } else {
+                return;
             }
             lineStruct = {
                 coverage: count,
