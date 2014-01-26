@@ -19,7 +19,7 @@ gulp.task('lint', function () {
 });
 
 gulp.task('debug', function () {
-    exec('node --debug-brk blnkt.js', {}, function (error, stdout, stderr) {
+    exec('node --debug-brk chaindebug.js', {}, function (error, stdout, stderr) {
         console.log('STDOUT');
         console.log(stdout);
         console.log('STDERR');
@@ -79,4 +79,19 @@ gulp.task('watch', function () {
       gulp.run('mocha');
     });    
 });
+
+gulp.task('testchain', function () {
+    gulp.src(['srcchain.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['**/chain.js'],
+            debugDirectory: 'debug'
+        }))
+        .pipe(mocha({
+            reporter: 'spec'
+        }))
+        .pipe(cover.report({
+            outFile: 'chain.html'
+        }));
+});
+
 

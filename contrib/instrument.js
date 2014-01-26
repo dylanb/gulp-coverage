@@ -1,3 +1,27 @@
+/*
+ * Original code from https://github.com/itay/node-cover licensed under MIT did
+ * not have a Copyright message in the file.
+ *
+ * Changes for the chain coverage instrumentation Copyright (C) 2014 Dylan Barrell
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
 var fs           = require('fs');
 var esprima      = require('./esprima');
 var escodegen    = require('./escodegen');
@@ -58,7 +82,9 @@ function Instrumentor(src) {
     this.names = {
         statement: this.generateName(6, "__statement_"),
         expression: this.generateName(6, "__expression_"),
-        block: this.generateName(6, "__block_")
+        block: this.generateName(6, "__block_"),
+        intro: this.generateName(6, "__intro_"),
+        extro: this.generateName(6, "__extro_")
     };
     
     // Setup the node store
@@ -368,10 +394,66 @@ Instrumentor.prototype.wrap = function(tree, ignoredLines) {
                 node.alternate = newAlternateNode;
                 break;
             }
+            case esprima.Syntax.CallExpression:
+                if (node.callee.type === 'MemberExpression') {
+                    var newNode = {
+                        "type": "CallExpression",
+                        "callee": {
+                           "type": "Identifier",
+                           "name": that.names.extro
+                        },
+                        "arguments": [
+                           {
+                              "type": "Identifier",
+                              "name": that.nodeCounter
+                           },
+                           node
+                        ]
+                    },
+                    intro = {
+                        "type": "CallExpression",
+                        "seen": true,
+                        "callee": {
+                           "type": "Identifier",
+                           "name": that.names.intro
+                        },
+                        "arguments":[{
+                              "type": "Identifier",
+                              "name": that.nodeCounter++
+                            },
+                            node.callee.object
+                        ]
+                    };
+                    node.callee.object = intro;
+                    that.nodes[that.nodeCounter - 1] = node;
+                    node.id = that.nodeCounter - 1;
+                } else if (!node.seen) {
+                    var newNode = {
+                        "type": "SequenceExpression",
+                        "expressions": [
+                            {
+                                "type": "CallExpression",
+                                "callee": {
+                                    "type": "Identifier",
+                                    "name": that.names.expression
+                                },
+                                "arguments": [
+                                    {
+                                        "type": "Identifier",
+                                        "name": that.nodeCounter++
+                                    }
+                                ]
+                            },
+                            node
+                        ]
+                    }
+                    that.nodes[that.nodeCounter - 1] = node;
+                    node.id = that.nodeCounter - 1;
+                }                
+                return newNode                
             case esprima.Syntax.BinaryExpression:
             case esprima.Syntax.UpdateExpression:
             case esprima.Syntax.LogicalExpression:
-            case esprima.Syntax.CallExpression:
             case esprima.Syntax.UnaryExpression:
             case esprima.Syntax.Identifier: {
                 // Only instrument Identifier in certain context.
