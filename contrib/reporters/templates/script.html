@@ -45,5 +45,10 @@ jQuery(document).ready(function() {
       }
     });
   });
+  jQuery(window).on('hashchange', function (e) {
+    if (!jQuery(window.location.hash).attr('tabindex')) {
+      jQuery(window.location.hash).attr('tabindex', '-1').focus();
+    }
+  })
 });
 </script>
