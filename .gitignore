@@ -17,5 +17,9 @@ debug
 .coverrun
 .coverdata
 coverage.html
+chain.html
+json.json
+jasmine.html
+blnkt.html
 .DS_Store
 
