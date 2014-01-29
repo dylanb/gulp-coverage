@@ -81,7 +81,7 @@ gulp.task('watch', function () {
 });
 
 gulp.task('testchain', function () {
-    gulp.src(['srcchain.js'], { read: false })
+    gulp.src(['testsupport/srcchain.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/chain.js'],
             debugDirectory: 'debug'
