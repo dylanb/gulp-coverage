@@ -201,7 +201,7 @@ FileCoverageData.prototype.stats = function() {
             if (node.count) {
                 statements += 1;
             }
-            loc = {}
+            loc = {};
             extend(loc, node.loc);
             statementDetails.push({
                 loc: loc,
@@ -359,7 +359,7 @@ function getSegments(code, lines, count, statementDetails) {
         }
         startOff += item.loc.start.column;
         endOff = 0;
-        lineNo = beginLine
+        lineNo = beginLine;
         while (item.loc.end.line > lineNo) {
             endOff += lengths[lineNo] + 1;
             lineNo += 1;
@@ -448,7 +448,7 @@ function getSegments(code, lines, count, statementDetails) {
             return p;
         } else {
             combined.push(c);
-            return c
+            return c;
         }
     });
     // combine adjacent segments
@@ -613,7 +613,7 @@ function linesWithData(lines) {
             });
         }
     });
-    interim.sort(function(a,b) {return a - b});
+    interim.sort(function(a,b) {return a - b;});
     unique = [interim[0]];
     interim.reduce(function(p, c) {
         if (p === c) {
@@ -621,7 +621,7 @@ function linesWithData(lines) {
             return p;
         } else {
             unique.push(c);
-            return c
+            return c;
         }
     });
     return unique;

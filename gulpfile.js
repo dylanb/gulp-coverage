@@ -34,6 +34,11 @@ gulp.task('debug', function () {
 /*
  * these tasks are to actually use the plugin and test it within the context of gulp
  */
+
+gulp.task('default', function(){
+  gulp.run('mocha', 'json', 'jasmine', 'testchain', 'test', 'lint');
+});
+
 gulp.task('mocha', function () {
     gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
         .pipe(cover.instrument({
@@ -44,7 +49,7 @@ gulp.task('mocha', function () {
             reporter: 'spec'
         }))
         .pipe(cover.report({
-            outFile: 'blnkt.html'
+            outFile: 'testoutput/blnkt.html'
         }));
 });
 
@@ -58,7 +63,7 @@ gulp.task('json', function () {
         }))
         .pipe(cover.report({
             reporter: 'json',
-            outFile: 'json.json'
+            outFile: 'testoutput/json.json'
         }));
 });
 
@@ -70,7 +75,7 @@ gulp.task('jasmine', function () {
         }))
         .pipe(jasmine())
         .pipe(cover.report({
-            outFile: 'jasmine.html'
+            outFile: 'testoutput/jasmine.html'
         }));
 });
 
@@ -90,7 +95,7 @@ gulp.task('testchain', function () {
             reporter: 'spec'
         }))
         .pipe(cover.report({
-            outFile: 'chain.html'
+            outFile: 'testoutput/chain.html'
         }));
 });
 
