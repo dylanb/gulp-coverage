@@ -35,7 +35,7 @@ gulp.task('debug', function () {
  * these tasks are to actually use the plugin and test it within the context of gulp
  */
 gulp.task('mocha', function () {
-    gulp.src(['src.js', 'src3.js'], { read: false })
+    gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
             debugDirectory: 'debug'
@@ -49,7 +49,7 @@ gulp.task('mocha', function () {
 });
 
 gulp.task('json', function () {
-    gulp.src(['src.js', 'src3.js'], { read: false })
+    gulp.src(['testsupport/src.js', 'vsrc3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*']
         }))
@@ -63,7 +63,7 @@ gulp.task('json', function () {
 });
 
 gulp.task('jasmine', function () {
-    gulp.src('srcjasmine.js')
+    gulp.src('testsupport/srcjasmine.js')
         .pipe(cover.instrument({
             pattern: ['**/test*'],
             debugDirectory: 'debug'
@@ -75,7 +75,7 @@ gulp.task('jasmine', function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch(['src.js', 'src3.js', 'test.js', 'test2.js'], function(event) {
+    gulp.watch(['testsupport/src.js', 'testsupport/src3.js', 'test.js', 'test2.js'], function(event) {
       gulp.run('mocha');
     });    
 });

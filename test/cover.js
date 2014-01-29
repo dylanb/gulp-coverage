@@ -64,21 +64,21 @@ describe('cover.js', function () {
     describe('coverInst', function () {
         var coverInst;
         beforeEach(function () {
-            delete require.cache[require.resolve('../test')];
+            delete require.cache[require.resolve('../testsupport/test')];
             cover.cleanup();
             cover.init();
             coverInst = cover.cover('**/test.js', process.cwd() + '/debug/');
         });
         it('will cause the require function to instrument the file', function () {
-            var test = require('../test'),
-                filename = require.resolve('../test'),
+            var test = require('../testsupport/test'),
+                filename = require.resolve('../testsupport/test'),
                 outputPath = path.join(process.cwd() + '/debug/', filename.replace(/[\/|\:|\\]/g, "_") + ".js");
             assert.ok(fs.existsSync(outputPath));
         });
         it('will cause the data to be collected when the instrumented file is executed', function () {
-            var test = require('../test'),
+            var test = require('../testsupport/test'),
                 run = JSON.parse(fs.readFileSync(process.cwd() + '/.coverrun')).run,
-                filename = require.resolve('../test'),
+                filename = require.resolve('../testsupport/test'),
                 dataPath = path.join(process.cwd() + '/.coverdata/' + run, filename.replace(/[\/|\:|\\]/g, "_"));
             test();
             assert.ok(fs.existsSync(dataPath));
@@ -89,8 +89,8 @@ describe('cover.js', function () {
         cover.cleanup();
         cover.init();
         coverInst = cover.cover('**/test2.js');
-        test = require('../test2');
-        filename = require.resolve('../test2');
+        test = require('../testsupport/test2');
+        filename = require.resolve('../testsupport/test2');
         test();
         stats = coverInst.coverageData[filename].stats();
         it('will return the correct number of covered lines', function () {

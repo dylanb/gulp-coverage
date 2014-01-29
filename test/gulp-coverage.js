@@ -25,8 +25,8 @@ function removeDirTree(dir) {
 describe('gulp-coverage', function () {
     var writer, reader;
     beforeEach(function () {
-        delete require.cache[require.resolve('../test')];
-        delete require.cache[require.resolve('../src')];
+        delete require.cache[require.resolve('../testsupport/test')];
+        delete require.cache[require.resolve('../testsupport/src')];
         if (fs.existsSync(process.cwd() + '/.coverdata')) {
             removeDirTree(process.cwd() + '/.coverdata');
         }
@@ -47,7 +47,7 @@ describe('gulp-coverage', function () {
                 cb();
             },
             function (cb) {
-                var filename = require.resolve('../test');
+                var filename = require.resolve('../testsupport/test');
                 // Should have created the coverdata directory
                 assert.ok(fs.existsSync(process.cwd() + '/.coverdata'));
                 // Should have created the run directory
@@ -72,7 +72,7 @@ describe('gulp-coverage', function () {
                 .pipe(reader);
 
             writer.push({
-                path: require.resolve('../src.js')
+                path: require.resolve('../testsupport/src.js')
             });
             writer.end();
         });
@@ -105,7 +105,7 @@ describe('gulp-coverage', function () {
             })).pipe(reader);
 
             writer.write({
-                path: require.resolve('../src.js')
+                path: require.resolve('../testsupport/src.js')
             });
             writer.end();
         });
