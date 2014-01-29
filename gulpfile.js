@@ -19,7 +19,7 @@ gulp.task('lint', function () {
 });
 
 gulp.task('debug', function () {
-    exec('node --debug-brk chaindebug.js', {}, function (error, stdout, stderr) {
+    exec('node --debug-brk debug/chaindebug.js', {}, function (error, stdout, stderr) {
         console.log('STDOUT');
         console.log(stdout);
         console.log('STDERR');
