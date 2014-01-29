@@ -9,6 +9,7 @@ var path = require('path');
 var fs = require('fs');
 var cover = require('./contrib/cover');
 var through2 = require('through2');
+var gutil = require('gulp-util');
 var coverInst;
 
 module.exports.instrument = function (options) {
@@ -16,9 +17,14 @@ module.exports.instrument = function (options) {
     cover.init();
     coverInst = cover.cover(options.pattern, options.debugDirectory);
 
-    return through2.obj(function (file, encoding, done) {
+    return through2.obj(function (file, encoding, cb) {
+        if (!file.path) {
+            this.emit('error', new gutil.PluginError('gulp-coverage', 'Streaming not supported'));
+            return cb();
+        }
+
         this.push(file);
-        done();
+        cb();
     },
     function (cb) {
         cb();
@@ -30,6 +36,10 @@ module.exports.report = function (options) {
 
     return through2.obj(
         function (file, encoding, cb) {
+            if (!file.path) {
+                this.emit('error', new gutil.PluginError('gulp-coverage', 'Streaming not supported'));
+                return cb();
+            }
             cb();
         }, function (cb) {
             var stats;

@@ -76,12 +76,46 @@ describe('gulp-coverage', function () {
             });
             writer.end();
         });
+        it('should throw if passed a real stream', function(done) {
+            writer = through2(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            }, function (cb) {
+                cb();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['**/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            }).on('error', function(err) {
+                assert.equal(err.message, 'Streaming not supported');
+                done();                
+            }));
+            writer.write('Some bogus data');
+            writer.end();
+        });
     });
     describe('report', function () {
         beforeEach(function () {
             if (fs.existsSync('coverage.html')) {
                 fs.unlinkSync('coverage.html');
             }
+        });
+        it('should throw if passed a real stream', function(done) {
+            writer = through2(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            }, function (cb) {
+                cb();
+            });
+            writer.pipe(cover.report({
+                outFile: 'coverage.html',
+                reporter: 'html'
+            }).on('error', function(err) {
+                assert.equal(err.message, 'Streaming not supported');
+                done();                
+            }));
+            writer.write('Some bogus data');
+            writer.end();
         });
         it('should create an HTML report', function (done) {
             reader = through2.obj(function (chunk, enc, cb) {
@@ -91,9 +125,6 @@ describe('gulp-coverage', function () {
                 assert.ok(fs.existsSync('coverage.html'));
                 cb();
                 done();
-            });
-            reader.on('error', function(){
-                console.log('error: ', arguments);
             });
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
