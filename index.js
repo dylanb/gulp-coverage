@@ -49,6 +49,7 @@ module.exports.report = function (options) {
             }
             stats = coverInst.allStats();
             cover.reporters[reporter](stats, options.outFile ? options.outFile : undefined);
+            this.push({ coverage: stats });
             cb();
         });
 };

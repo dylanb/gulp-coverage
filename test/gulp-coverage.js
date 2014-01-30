@@ -140,6 +140,33 @@ describe('gulp-coverage', function () {
             });
             writer.end();
         });
+        it('will send the coverage data through as a JSON structure', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.coverage);
+                assert.equal('number', typeof data.coverage.coverage);
+                assert.equal('number', typeof data.coverage.statements);
+                assert.equal('number', typeof data.coverage.blocks);
+                assert.ok(Array.isArray(data.coverage.files));
+                assert.equal(data.coverage.files[0].basename, 'test.js');
+                cb();
+            },
+            function (cb) {
+                cb();
+                done();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['**/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.report({
+                outFile: 'coverage.html',
+                reporter: 'html'
+            })).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();
+        });
     });
     describe('gather', function () {
         it('should throw if passed a real stream', function(done) {
@@ -159,7 +186,6 @@ describe('gulp-coverage', function () {
         it('will send the coverage data through as a JSON structure', function (done) {
             reader = through2.obj(function (data, enc, cb) {
                 assert.ok(data.coverage);
-                console.log(data.coverage.files[0]);
                 assert.equal('number', typeof data.coverage.coverage);
                 assert.equal('number', typeof data.coverage.statements);
                 assert.equal('number', typeof data.coverage.blocks);
