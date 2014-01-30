@@ -53,3 +53,22 @@ module.exports.report = function (options) {
         });
 };
 
+module.exports.gather = function () {
+    return through2.obj(
+        function (file, encoding, cb) {
+            if (!file.path) {
+                this.emit('error', new gutil.PluginError('gulp-coverage', 'Streaming not supported'));
+                return cb();
+            }
+            cb();
+        }, function (cb) {
+            var stats;
+
+            if (!coverInst) {
+                throw new Error('Must call instrument before calling report');
+            }
+            stats = coverInst.allStats();
+            this.push({ coverage: stats });
+            cb();
+        });
+};

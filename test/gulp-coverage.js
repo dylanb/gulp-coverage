@@ -141,4 +141,45 @@ describe('gulp-coverage', function () {
             writer.end();
         });
     });
+    describe('gather', function () {
+        it('should throw if passed a real stream', function(done) {
+            writer = through2(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            }, function (cb) {
+                cb();
+            });
+            writer.pipe(cover.gather().on('error', function(err) {
+                assert.equal(err.message, 'Streaming not supported');
+                done();                
+            }));
+            writer.write('Some bogus data');
+            writer.end();
+        });
+        it('will send the coverage data through as a JSON structure', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.coverage);
+                console.log(data.coverage.files[0]);
+                assert.equal('number', typeof data.coverage.coverage);
+                assert.equal('number', typeof data.coverage.statements);
+                assert.equal('number', typeof data.coverage.blocks);
+                assert.ok(Array.isArray(data.coverage.files));
+                assert.equal(data.coverage.files[0].basename, 'test.js');
+                cb();
+            },
+            function (cb) {
+                cb();
+                done();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['**/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.gather()).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();
+        });
+    });
 });
