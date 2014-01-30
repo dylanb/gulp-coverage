@@ -73,3 +73,35 @@ module.exports.gather = function () {
             cb();
         });
 };
+
+module.exports.enforce = function (options) {
+    var statements = options.statements || 100,
+        blocks = options.blocks || 100,
+        lines = options.lines || 100;
+    return through2.obj(
+        function (data, encoding, cb) {
+            if (!data.coverage) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'Must call gather or report before calling enforce'));
+                return cb();
+            }
+            if (data.coverage.statements < statements) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'statement coverage of ' + data.coverage.statements +
+                    ' does not meet the threshold of ' + statements));
+            }
+            if (data.coverage.coverage < lines) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'line coverage of ' + data.coverage.coverage +
+                    ' does not meet the threshold of ' + lines));
+            }
+            if (data.coverage.blocks < blocks) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'block coverage of ' + data.coverage.blocks +
+                    ' does not meet the threshold of ' + blocks));
+            }
+            cb();
+        }, function (cb) {
+            cb();
+        });
+};

@@ -208,4 +208,74 @@ describe('gulp-coverage', function () {
             writer.end();
         });
     });
+    describe('gather', function () {
+        it('should throw if not passed the correct data', function(done) {
+            writer = through2(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            }, function (cb) {
+                cb();
+            });
+            writer.pipe(cover.enforce({}).on('error', function(err) {
+                assert.equal(err.message, 'Must call gather or report before calling enforce');
+                done();                
+            }));
+            writer.write('Some bogus data');
+            writer.end();
+        });
+        it('will emit an error if the statement coverage is below the appropriate threshold', function (done) {
+            writer.pipe(cover.enforce({
+                statements: 100,
+                lines: 1,
+                blocks: 1
+            }).on('error', function(err) {
+                assert.equal(err.message.indexOf('statement coverage of'), 0);
+                done();                
+            }));
+            writer.push({
+                coverage: {
+                    statements: 99,
+                    coverage: 99,
+                    blocks: 99
+                }
+            });
+            writer.end();
+        });
+        it('will emit an error if the line coverage is below the appropriate threshold', function (done) {
+            writer.pipe(cover.enforce({
+                statements: 1,
+                lines: 100,
+                blocks: 1
+            }).on('error', function(err) {
+                assert.equal(err.message.indexOf('line coverage of'), 0);
+                done();                
+            }));
+            writer.push({
+                coverage: {
+                    statements: 99,
+                    coverage: 99,
+                    blocks: 99
+                }
+            });
+            writer.end();
+        });
+        it('will emit an error if the block coverage is below the appropriate threshold', function (done) {
+            writer.pipe(cover.enforce({
+                statements: 1,
+                lines: 1,
+                blocks: 100
+            }).on('error', function(err) {
+                assert.equal(err.message.indexOf('block coverage of'), 0);
+                done();                
+            }));
+            writer.push({
+                coverage: {
+                    statements: 99,
+                    coverage: 99,
+                    blocks: 99
+                }
+            });
+            writer.end();
+        });
+    });
 });
