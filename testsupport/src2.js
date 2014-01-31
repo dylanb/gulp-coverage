@@ -1,3 +1,5 @@
+delete require.cache[require.resolve('./test2')];
+
 var assert = require('assert'),
     test = require('./test2');
 
