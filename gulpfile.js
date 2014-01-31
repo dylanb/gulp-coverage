@@ -150,7 +150,9 @@ gulp.task('debug', debugDeps, debug);
 setup();
 
 gulp.task('watch', function () {
-    gulp.watch(['testsupport/src.js', 'testsupport/src3.js', 'test.js', 'test2.js'], function(event) {
-      gulp.run('mocha');
+    jasmineDeps = ['mocha'];
+    setup();
+    gulp.watch(['testsupport/src.js', 'testsupport/src3.js', 'testsupport/test.js', 'testsupport/test2.js'], function(event) {
+      gulp.run('jasmine');
     });    
 });
