@@ -4,17 +4,19 @@
     var fs = require('fs');
     var <%= instrumented.names.statement %>, <%= instrumented.names.expression %>, <%= instrumented.names.block %>;
     var store = require('<%= coverageStorePath %>');
-    var fd = store.register('<%= filename %>');
     
     <%= instrumented.names.statement %> = function(i) {
+        var fd = store.register('<%= filename %>');
         fs.writeSync(fd, '{"statement": {"node": ' + i + '}},\n');
     }; 
     
     <%= instrumented.names.expression %> = function(i) {
+        var fd = store.register('<%= filename %>');
         fs.writeSync(fd, '{"expression": {"node": ' + i + '}},\n');
     }; 
     
     <%= instrumented.names.block %> = function(i) {
+        var fd = store.register('<%= filename %>');
         fs.writeSync(fd, '{"block": ' + i + '},\n');
     }; 
     <%= instrumented.names.intro %> = function(id, obj) {
@@ -36,6 +38,7 @@
             'number' === typeof obj.length;
     }
     <%= instrumented.names.extro %> = function(id, obj) {
+        var fd = store.register('<%= filename %>');
         // console.log('__extro: ', id, ', obj.__instrumented_miss: ', obj.__instrumented_miss, ', obj.length: ', obj.length);
         if ('undefined' !== typeof obj && 'undefined' !== typeof obj.__instrumented_miss) {
             if (isProbablyChainable(obj, id) && obj.length === 0 && obj.__instrumented_miss[id]) {

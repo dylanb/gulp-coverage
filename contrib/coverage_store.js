@@ -12,7 +12,12 @@
             runDirectory = process.cwd() + '/.coverdata/' + run + '/';
 
         filename = filename.replace(/[\/|\:|\\]/g, "_");
-        if (!coverageStore[filename]) {
+        if (!coverageStore[filename] || !fs.existsSync(runDirectory + filename)) {
+            if (coverageStore.hasOwnProperty(filename)) {
+                fs.closeSync(coverageStore[filename]);
+                coverageStore[filename] = undefined;
+                delete coverageStore[filename];
+            }
             coverageStore[filename] = fs.openSync(runDirectory + filename, 'w');
         }
         return coverageStore[filename];
@@ -40,6 +45,7 @@
         for (filename in coverageStore) {
             if (coverageStore.hasOwnProperty(filename)) {
                 fs.closeSync(coverageStore[filename]);
+                coverageStore[filename] = undefined;
                 delete coverageStore[filename];
             }
         }

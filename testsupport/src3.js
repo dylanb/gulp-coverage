@@ -1,5 +1,3 @@
-delete require.cache[require.resolve('./test')];
-
 var assert = require('assert'),
     test = require('./test');
 

@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     mochaTask = require('gulp-mocha'),
     jshint = require('gulp-jshint'),
     exec = require('child_process').exec,
-    jasmineTask = require('gulp-jasmine'),
+    jasmineTask = require('../gulp-jasmine/index'),
     through2 = require('through2');
 
 /*

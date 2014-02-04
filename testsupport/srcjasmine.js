@@ -1,5 +1,3 @@
-delete require.cache[require.resolve('./test')];
-
 var test = require('./test');
 
 describe('Test Src', function () {
