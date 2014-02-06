@@ -13,6 +13,7 @@ var gutil = require('gulp-util');
 var coverInst;
 
 module.exports.instrument = function (options) {
+    options = options || {};
     cover.cleanup();
     cover.init();
     coverInst = cover.cover(options.pattern, options.debugDirectory);
@@ -32,6 +33,7 @@ module.exports.instrument = function (options) {
 };
 
 module.exports.report = function (options) {
+    options = options || {};
     var reporter = options.reporter || 'html';
 
     return through2.obj(
@@ -75,6 +77,7 @@ module.exports.gather = function () {
 };
 
 module.exports.enforce = function (options) {
+    options = options || {};
     var statements = options.statements || 100,
         blocks = options.blocks || 100,
         lines = options.lines || 100;
