@@ -20,6 +20,7 @@ The HTML report format has been desiged to be accessible and conformant with WCA
 
 To instrument and report on a file using Mocha as your test runner:
 
+```js
     mocha = require('gulp-mocha');
     cover = require('gulp-coverage');
 
@@ -35,9 +36,11 @@ To instrument and report on a file using Mocha as your test runner:
                 outFile: 'coverage.html'
             }));
     });
+```
 
 To instrument and report using Jasmine as your test system:
 
+```js
     jasmine = require('gulp-jasmine');
     cover = require('gulp-coverage');
 
@@ -52,7 +55,7 @@ To instrument and report using Jasmine as your test system:
                 outFile: 'jasmine.html'
             }));
     });
-
+```
 
 ## Tasks
 
