@@ -198,7 +198,7 @@ describe('gulp-coverage', function () {
                 done();
             });
             writer.pipe(cover.instrument({
-                pattern: ['**/test*'],
+                pattern: ['testsupport/test*'],
                 debugDirectory: process.cwd() + '/debug/'
             })).pipe(mocha({
             })).pipe(cover.gather()).pipe(reader);

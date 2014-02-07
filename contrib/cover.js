@@ -277,14 +277,16 @@ var CoverageSession = function(pattern, debugDirectory) {
     }
     var originalRequire = this.originalRequire = require.extensions['.js'];
     var coverageData = this.coverageData = {};
-    var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js").replace(/\\/g, "/");
-    var templatePath = path.resolve(path.resolve(__dirname), "templates", "instrumentation_header.js");
+    var pathToCoverageStore = path.resolve(path.resolve(__dirname), 'coverage_store.js').replace(/\\/g, '/');
+    var templatePath = path.resolve(path.resolve(__dirname), 'templates', 'instrumentation_header.js');
     var template = fs.readFileSync(templatePath, 'utf-8');
     require.extensions['.js'] = function(module, filename) {
-        filename = filename.replace(/\\/g, "/");
+        var shortFilename;
+        filename = filename.replace(/\\/g, '/');
 
-        //console.log('filename: ', filename, ', pattern: ', pattern, ', match: ', multimatch(filename, pattern));
-        if (!multimatch(filename, pattern).length) {
+        shortFilename = filename.replace(process.cwd() + '/', '')
+        // console.log('filename: ', filename, ', shortFilename:', shortFilename, ', pattern: ', pattern, ', match: ', multimatch(shortFilename, pattern));
+        if (!multimatch(shortFilename, pattern).length) {
             return originalRequire(module, filename);
         }
         if (filename === pathToCoverageStore) {
@@ -300,7 +302,7 @@ var CoverageSession = function(pattern, debugDirectory) {
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
 
         if (debugDirectory) {
-            var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, "_") + ".js");
+            var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, '_') + '.js');
             fs.writeFileSync(outputPath, newCode);
         }
 
