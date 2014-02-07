@@ -506,7 +506,7 @@ function splitOverlaps(lines, code) {
                     }
                 }            
             }
-            if (lines[i].statementDetails[0].loc.start.column) {
+            if (lines[i].statementDetails[0] && lines[i].statementDetails[0].loc.start.column) {
                 lines[i].statementDetails[0].loc.start.column = 0;
             }
             for (j = i + 1; j < lines.length; j++) {
@@ -592,7 +592,8 @@ function splitOverlaps(lines, code) {
         if (!lines[j]) {
             lines[j] = undefined;
         } else {
-            if (lines[j].statementDetails[0].loc.start.column === 0 &&
+            if (lines[j].statementDetails[0] &&
+                lines[j].statementDetails[0].loc.start.column === 0 &&
                 lines[j].statementDetails[0].loc.end.column === 0) {
                 lines[j] = undefined;
             }
@@ -690,7 +691,7 @@ CoverageSession.prototype.allStats = function () {
         code.forEach(function(codeLine, index){
             var count = null, statements = null, numStatements = 0, segs, lineNo, allSame = true, lineStruct;
             line = lines[index];
-            if (line) {
+            if (line && line.statementDetails[0]) {
                 count = line.count;
                 statements = 0;
                 lineNo = line.statementDetails[0].loc.start.line;
