@@ -59,7 +59,7 @@ To instrument and report using Jasmine as your test system:
 
 ## Tasks
 
-There are four different tasks, `instrument`, `gather`, `report`, and `enforce`. The `instrument` task must be run before any of the others can be called and either the `gather`, or the `report` task must be run before the `enforce` task can be run.
+There are five different tasks, `instrument`, `gather`, `report`, `format` and `enforce`. The `instrument` task must be run before any of the others can be called and either the `gather`, or the `report` task must be run before the `enforce` or the `format` task can be run. Enforce can follow `format` and should be run last if you want the reports generated even when the thresholds have not been met.
 
 After the `instrument` call, the target files must be required and executed (preferably using some sort of test runner such as gulp-mocha or gulp-jasmine). This will allow the instrumentation to capture the required data (in the example above, this is done by the mocha test runner).
 
@@ -140,3 +140,17 @@ If you would like to specify thresholds lower than 100%, pass in the thresholds 
     lines: 100
 }```
 
+## The Format Task
+
+The `format` task can be used to generate a textual, formatted version of the coverage data and emit this to the Gulp stream. By default, it will call the 'html' formatter (and this is currently the only formatter that makes sense). It will add the formatted text to the `output` attribute of the stream object that gets emitted. After calling both `gather` and `format`, the stream data object will look like this:
+
+```{
+  coverage: the coverage data structure,
+  output: the formatted textual version of the coverage data
+}```
+
+You must call `gather` prior to calling `format`.
+
+### arguments
+
+The task takes one optional argument of type String that represents the formatter to be used. The default value is 'html'.
