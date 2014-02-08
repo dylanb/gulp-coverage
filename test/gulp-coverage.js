@@ -208,7 +208,7 @@ describe('gulp-coverage', function () {
             writer.end();
         });
     });
-    describe('gather', function () {
+    describe('enforce', function () {
         it('should throw if not passed the correct data', function(done) {
             writer = through2(function (chunk, enc, cb) {
                 this.push(chunk);
