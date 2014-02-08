@@ -278,4 +278,70 @@ describe('gulp-coverage', function () {
             writer.end();
         });
     });
+    describe('format', function () {
+        it('should throw if not passed the correct data', function (done) {
+            writer = through2(function (chunk, enc, cb) {
+                this.push(chunk);
+                cb();
+            }, function (cb) {
+                cb();
+            });
+            writer.pipe(cover.format({}).on('error', function(err) {
+                assert.equal(err.message, 'Must call gather before calling enforce');
+                done();                
+            }));
+            writer.write('Some bogus data');
+            writer.end();
+        });
+        it('will add an "output" item to the stream object that is typeof "string"', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.coverage);
+                assert.ok(data.output);
+                assert.equal(typeof data.output, 'string');
+                cb();
+            },
+            function (cb) {
+                cb();
+                done();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['testsupport/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.gather(
+            )).pipe(cover.format(
+            )).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();            
+        });
+        it('can be chained with "enforce"', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.coverage);
+                assert.ok(data.output);
+                assert.equal(typeof data.output, 'string');
+                cb();
+            },
+            function (cb) {
+                cb();
+                done();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['testsupport/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.gather(
+            )).pipe(cover.format(
+            )).pipe(cover.enforce({
+                statements: 80,
+                lines: 83,
+                blocks: 60
+            })).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();            
+        });
+    });
 });
