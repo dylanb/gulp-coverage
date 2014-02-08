@@ -79,42 +79,51 @@ The format of the JSON structure is a Modified LCOV format. The format has been 
 
 ### The Modified LCOV JSON format
 
-```lcov : {
-       sloc: Integer - how many source lines of code there were in total
-       ssoc: Integer - how many statements of code there were in total
-       sboc: Integer - how many blocks of code there were in total
-       coverage: Float - percentage of lines covered
-       statements: Float - percentage of statements covered
-       blocks: Float: percentage of blocks covered
-       files: Array[Object] - array of information about each file
-}```
+```
+  lcov : {
+         sloc: Integer - how many source lines of code there were in total
+         ssoc: Integer - how many statements of code there were in total
+         sboc: Integer - how many blocks of code there were in total
+         coverage: Float - percentage of lines covered
+         statements: Float - percentage of statements covered
+         blocks: Float: percentage of blocks covered
+         files: Array[Object] - array of information about each file
+  }
+```
 
 Each `file` has the following structure
-```file : {
-       filename: String - the file
-       basename: String - the file short name
-       segments: String - the file's directory
-       coverage: Float - the percentage of lines covered
-       statements: Float - the percentage of statements covered
-       blocks: Float - the percentage of blocks covered
-       source: Array[Object] - array of objects, one for each line of code
-       sloc: Integer - the number of lines of code
-       ssoc: Integer - the number of statements of code
-       sboc: Integer - the number of blocks of code
-}```
+
+```
+  file : {
+         filename: String - the file
+         basename: String - the file short name
+         segments: String - the file's directory
+         coverage: Float - the percentage of lines covered
+         statements: Float - the percentage of statements covered
+         blocks: Float - the percentage of blocks covered
+         source: Array[Object] - array of objects, one for each line of code
+         sloc: Integer - the number of lines of code
+         ssoc: Integer - the number of statements of code
+         sboc: Integer - the number of blocks of code
+  }
+```
 
 Source contains `line` objects which have the following structure
-```line : {
-       count: Integer - number of times the line was hit
-       statements: Float - the percentage of statements covered
-       segments: Array[Object] - the segments of statements that make up the line
-}```
+```
+  line : {
+         count: Integer - number of times the line was hit
+         statements: Float - the percentage of statements covered
+         segments: Array[Object] - the segments of statements that make up the line
+  }
+```
 
 Each statement `segment` has the following structure
-```segment : {
-     code: String - the string of code for the segment
-     count: Integer - the hit count for the segment
-}```
+```
+  segment : {
+       code: String - the string of code for the segment
+       count: Integer - the hit count for the segment
+  }
+```
 
 ## The Report Task
 
