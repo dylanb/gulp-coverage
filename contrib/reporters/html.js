@@ -21,7 +21,7 @@ function HTMLCov (coverageData, filename) {
 			coverageCategory: coverageCategory
 		});
 	if (!filename) {
-		process.stdout.write();
+		return output;
 	} else {
 		fs.writeFileSync(filename, output);
 	}
