@@ -302,6 +302,9 @@ var CoverageSession = function(pattern, debugDirectory) {
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
 
         if (debugDirectory) {
+            if (!fs.existsSync(debugDirectory)) {
+                fs.mkdirSync(debugDirectory);
+            }
             var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, '_') + '.js');
             fs.writeFileSync(outputPath, newCode);
         }
