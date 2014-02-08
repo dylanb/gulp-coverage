@@ -108,3 +108,20 @@ module.exports.enforce = function (options) {
             cb();
         });
 };
+
+module.exports.format = function (reporter) {
+    reporter = reporter || 'html';
+    return through2.obj(
+        function (data, encoding, cb) {
+            if (!data.coverage) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'Must call gather before calling enforce'));
+                return cb();
+            }
+            data.output = cover.reporters[reporter](data.coverage);
+            this.push(data);
+            cb();
+        }, function (cb) {
+            cb();
+        });
+};
