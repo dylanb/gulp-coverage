@@ -134,20 +134,23 @@ The `enforce` task can be used to emit an error (throw an exception) when the ov
 
 If you would like to specify thresholds lower than 100%, pass in the thresholds in the first argument to the task. The defaults are:
 
+```
   options : {
       statements: 100,
       blocks: 100,
       lines: 100
   }
-
+```
 ## The Format Task
 
 The `format` task can be used to generate a textual, formatted version of the coverage data and emit this to the Gulp stream. By default, it will call the 'html' formatter (and this is currently the only formatter that makes sense). It will add the formatted text to the `output` attribute of the stream object that gets emitted. After calling both `gather` and `format`, the stream data object will look like this:
 
+```
   {
     coverage: the coverage data structure,
     output: the formatted textual version of the coverage data
   }
+```
 
 You must call `gather` prior to calling `format`.
 
