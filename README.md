@@ -69,7 +69,9 @@ The gulp-coverage `gather` task will NOT pass any of the original stream files t
 
 ### options
 
-`pattern` - A multimatch glob pattern or list of glob patterns. The patterns can include match and exclude patterns. In the above example, there are two JavaScript files `test.js` and `test2.js` that are required by the two test files `src.js` and `src2.js`. The `**` will match these files no matter which directory they live in.Patterns are additive while negations (eg ['**/foo*', '!**/bar*']) are based on the current set. Exception is if the first pattern is negation, then it will get the full set, so to match user expectation (eg. ['!**/foo*'] will match everything except a file with foo in its name). Order matters. 
+`pattern` - A multimatch glob pattern or list of glob patterns. The globa patterns are relative to the CWD of the process running the gulp file. The pattern `'index.js'` will match the index.js file in the same directory as the gulpfile. Globs for file relative to this directory must NOT contain the './'. For example DO NOT use `'./index.js'` to try to achieve the same outcome (however, you can use `'**/index.js'` to match this file).
+
+The patterns can include match and exclude patterns. In the Mocha and Jasmine examples shown above, there are two JavaScript files `test.js` and `test2.js` that are required by the two test files `src.js` and `src2.js`. The `**` will match these files no matter which directory they live in. Patterns are additive while negations (eg ['**/foo*', '!**/bar*']) are based on the current set. Exception is if the first pattern is negation, then it will get the full set, so to match user expectation (eg. ['!**/foo*'] will match everything except a file with foo in its name). Order matters. 
 
 `debugDirectory` - a string pointing to a directory into which the instrumented source will be written. This is useful for debugging gulp-coverage itself
 
