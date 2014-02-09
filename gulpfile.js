@@ -100,6 +100,7 @@ function jasmine (done) {
         .pipe(cover.report({
             outFile: 'testoutput/jasmine.html'
         })
+        .pipe(cover.enforce())
         .pipe(synchro(done)));
 }
 
@@ -112,10 +113,12 @@ function testchain (done) {
         .pipe(mochaTask({
             reporter: 'spec'
         }))
-        .pipe(cover.report({
-            outFile: 'testoutput/chain.html'
-        })
-        .pipe(synchro(done)));
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'chain.html'
+        }))
+        .pipe(gulp.dest('./testoutput'))
+        .pipe(synchro(done));
 }
 
 /*
@@ -156,3 +159,4 @@ gulp.task('watch', function () {
       gulp.run('jasmine');
     });    
 });
+

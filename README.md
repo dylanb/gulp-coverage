@@ -152,17 +152,19 @@ If you would like to specify thresholds lower than 100%, pass in the thresholds 
 ```
 ## The Format Task
 
-The `format` task can be used to generate a textual, formatted version of the coverage data and emit this to the Gulp stream. By default, it will call the 'html' formatter (and this is currently the only formatter that makes sense). It will add the formatted text to the `output` attribute of the stream object that gets emitted. After calling both `gather` and `format`, the stream data object will look like this:
+The `format` task can be used to generate a textual, formatted version of the coverage data and emit this to the Gulp stream. By default, it will call the 'html' formatter (and this is currently the only formatter that makes sense). It will add the formatted text the stream. After calling both `gather` and `format`, the stream will contain a vinyl file with an additional attribute called `coverage`, that contains the JSON formatted data.
 
-```
-  {
-    coverage: the coverage data structure,
-    output: the formatted textual version of the coverage data
-  }
-```
+The coverage file will be called "coverage.html" by default and can be output to the disk using gulp.dest()
 
 You must call `gather` prior to calling `format`.
 
-### arguments
+### options
 
-The task takes one optional argument of type String that represents the formatter to be used. The default value is 'html'.
+The task takes one optional argument that contains the options. There are 2 options, here are the default values:
+
+```
+  {
+    reporter: 'html',
+    outFile: 'coverage.html'
+  }
+```

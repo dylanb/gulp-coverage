@@ -293,16 +293,17 @@ describe('gulp-coverage', function () {
             writer.write('Some bogus data');
             writer.end();
         });
-        it('will add an "output" item to the stream object that is typeof "string"', function (done) {
+        it('will add an "contents" item to the stream object', function (done) {
             reader = through2.obj(function (data, enc, cb) {
                 assert.ok(data.coverage);
-                assert.ok(data.output);
-                assert.equal(typeof data.output, 'string');
+                assert.ok(data.contents);
+                assert.equal(typeof data.contents, 'object');
+                assert.ok(data.path.indexOf('coverage.html') !== -1);
+                done();
                 cb();
             },
             function (cb) {
                 cb();
-                done();
             });
             writer.pipe(cover.instrument({
                 pattern: ['testsupport/test*'],
@@ -311,6 +312,28 @@ describe('gulp-coverage', function () {
             })).pipe(cover.gather(
             )).pipe(cover.format(
             )).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();            
+        });
+        it('will give the output file the name passed into the options', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.path.indexOf('cvrg.html') !== -1);
+                done();
+                cb();
+            },
+            function (cb) {
+                cb();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['testsupport/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.gather(
+            )).pipe(cover.format({
+                outFile: 'cvrg.html'
+            })).pipe(reader);
             writer.write({
                 path: require.resolve('../testsupport/src.js')
             });

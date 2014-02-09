@@ -109,17 +109,27 @@ module.exports.enforce = function (options) {
         });
 };
 
-module.exports.format = function (reporter) {
-    reporter = reporter || 'html';
+module.exports.format = function (options) {
+    options = options || {};
+    var reporter = options.reporter || 'html';
+    var outfile = options.outFile || 'coverage.html';
     return through2.obj(
         function (data, encoding, cb) {
+            var file;
             if (!data.coverage) {
                 this.emit('error', new gutil.PluginError('gulp-coverage',
                     'Must call gather before calling enforce'));
-                return cb();
+                cb();
+                return 
             }
-            data.output = cover.reporters[reporter](data.coverage);
-            this.push(data);
+            file = new gutil.File({
+                base: path.join(__dirname, './'),
+                cwd: __dirname,
+                path: path.join(__dirname, './', outfile),
+                contents: new Buffer(cover.reporters[reporter](data.coverage))
+            });
+            file.coverage = data.coverage
+            this.push(file);
             cb();
         }, function (cb) {
             cb();
