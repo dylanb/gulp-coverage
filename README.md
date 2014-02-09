@@ -63,6 +63,8 @@ There are five different tasks, `instrument`, `gather`, `report`, `format` and `
 
 After the `instrument` call, the target files must be required and executed (preferably using some sort of test runner such as gulp-mocha or gulp-jasmine). This will allow the instrumentation to capture the required data (in the example above, this is done by the mocha test runner).
 
+The gulp-coverage `gather` task will NOT pass any of the original stream files to the subsequent tasks. It must therefore be called after all other stream transformations have occurred.
+
 ## The Instrument task
 
 ### options
@@ -125,16 +127,6 @@ Each statement `segment` has the following structure
   }
 ```
 
-## The Report Task
-
-This will generate the reports for the instrumented files and can only be called after `instrument` has been called. It will also change the stream content for the tasks and pass through the LCOV JSON data so that the enforce task can be run.
-
-### options
-
-`outFile` - the name of the file into which the report output will be written
-
-`reporter` - defaults to 'html' - this is the name of the reporter to use. Currently there are an HTML reporter ('html') and a JSON ('json') reporter.
-
 ## The Enforce Task
 
 The `enforce` task can be used to emit an error (throw an exception) when the overall coverage values fall below your specified thresholds. The default thesholds are 100% for all metrics. This task is useful if you would like the Gulp task to fail in a way that your CI or build system can easily detect.
@@ -168,3 +160,16 @@ The task takes one optional argument that contains the options. There are 2 opti
     outFile: 'coverage.html'
   }
 ```
+
+## The Report Task (Deprecated)
+
+This task is deprecated because it does not support the gulp.dest task and will probably be removed before the first 1.0.0 release.
+
+Report will generate the reports for the instrumented files and can only be called after `instrument` has been called. It will also change the stream content for the tasks and pass through the LCOV JSON data so that the enforce task can be run.
+
+### options
+
+`outFile` - the name of the file into which the report output will be written
+
+`reporter` - defaults to 'html' - this is the name of the reporter to use. Currently there are an HTML reporter ('html') and a JSON ('json') reporter.
+
