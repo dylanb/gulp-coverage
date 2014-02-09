@@ -293,7 +293,7 @@ describe('gulp-coverage', function () {
             writer.write('Some bogus data');
             writer.end();
         });
-        it('will add an "contents" item to the stream object', function (done) {
+        it('will add a "contents" item to the stream object', function (done) {
             reader = through2.obj(function (data, enc, cb) {
                 assert.ok(data.coverage);
                 assert.ok(data.contents);
@@ -312,6 +312,33 @@ describe('gulp-coverage', function () {
             })).pipe(cover.gather(
             )).pipe(cover.format(
             )).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src.js')
+            });
+            writer.end();            
+        });
+        it('will add a "contents" item to the stream object in JSON format if asked', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                var strContents = data.contents.toString(),
+                    json = JSON.parse(strContents);
+
+                assert.ok(json.hasOwnProperty('files'));
+                assert.ok(data.path.indexOf('coverage.json') !== -1);
+                done();
+                cb();
+            },
+            function (cb) {
+                cb();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['testsupport/test*'],
+                debugDirectory: process.cwd() + '/debug/'
+            })).pipe(mocha({
+            })).pipe(cover.gather(
+            )).pipe(cover.format({
+                reporter: 'json'
+            })).pipe(reader);
+
             writer.write({
                 path: require.resolve('../testsupport/src.js')
             });

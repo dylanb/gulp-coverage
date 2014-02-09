@@ -112,7 +112,7 @@ module.exports.enforce = function (options) {
 module.exports.format = function (options) {
     options = options || {};
     var reporter = options.reporter || 'html';
-    var outfile = options.outFile || 'coverage.html';
+    var outfile = options.outFile || 'coverage.' + reporter;
     return through2.obj(
         function (data, encoding, cb) {
             var file;

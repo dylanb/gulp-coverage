@@ -12,8 +12,8 @@ exports = module.exports = JSONCov;
 
 function JSONCov (coverageData, filename) {
     if (!filename) {
-        process.stdout.write(JSON.stringify(coverageData));
+        return JSON.stringify(coverageData, null, ' ');
     } else {
-        fs.writeFileSync(filename, JSON.stringify(coverageData));
+        fs.writeFileSync(filename, JSON.stringify(coverageData, null, ' '));
     }
 }
