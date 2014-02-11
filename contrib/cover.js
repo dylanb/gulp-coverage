@@ -284,7 +284,7 @@ var CoverageSession = function(pattern, debugDirectory) {
         var shortFilename;
         filename = filename.replace(/\\/g, '/');
 
-        shortFilename = filename.replace(process.cwd() + '/', '')
+        shortFilename = path.relative(process.cwd(), filename);
         // console.log('filename: ', filename, ', shortFilename:', shortFilename, ', pattern: ', pattern, ', match: ', multimatch(shortFilename, pattern));
         if (!multimatch(shortFilename, pattern).length) {
             return originalRequire(module, filename);
