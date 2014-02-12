@@ -117,6 +117,7 @@ function testchain (done) {
         .pipe(cover.format({
             outFile: 'chain.html'
         }))
+        .pipe(gulp.dest('./testoutput'))
         .pipe(cover.format({
             outFile: 'chain.json',
             reporter: 'json'
