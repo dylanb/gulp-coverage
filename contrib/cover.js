@@ -732,6 +732,7 @@ CoverageSession.prototype.allStats = function () {
             };
             sourceArray.push(lineStruct);
         });
+        filename = path.relative(process.cwd(), filename);
         segments = filename.split('/');
         item = {
             filename: filename,
@@ -778,7 +779,7 @@ var cover = function(pattern, debugDirectory) {
 function removeDir(dirName) {
     fs.readdirSync(dirName).forEach(function(name) {
         if (name !== '.' && name !== '..') {
-            fs.unlinkSync(dirName + '/' + name);
+            fs.unlinkSync(path.join(dirName, name));
         }
     });
     fs.rmdirSync(dirName);
@@ -791,18 +792,18 @@ function removeDir(dirName) {
  */
 var init = function() {
     var directoryName = '.cover_' + Math.random().toString().substring(2),
-        dataDir = process.cwd() + '/.coverdata';
+        dataDir = path.join(process.cwd(), '.coverdata');
     if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir);
     } else {
         fs.readdirSync(dataDir).forEach(function(name) {
             if (name !== '.' && name !== '..') {
-                removeDir(dataDir + '/' + name);
+                removeDir(path.join(dataDir, name));
             }
         });
     }
-    fs.mkdirSync(dataDir + '/' + directoryName);
-    fd = fs.writeFileSync(process.cwd() + '/.coverrun', '{ "run" : "' + directoryName + '" }');
+    fs.mkdirSync(path.join(dataDir, directoryName));
+    fd = fs.writeFileSync(path.join(process.cwd(), '.coverrun'), '{ "run" : "' + directoryName + '" }');
     global.coverageData = {};
 };
 
