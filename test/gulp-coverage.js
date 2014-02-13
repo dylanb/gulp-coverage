@@ -5,6 +5,17 @@ var assert = require('assert'),
     path = require('path'),
     mocha = require('gulp-mocha');
 
+function clearStore() {
+    var filename;
+    for (filename in coverageStore) {
+        if (coverageStore.hasOwnProperty(filename)) {
+            fs.closeSync(coverageStore[filename]);
+            coverageStore[filename] = undefined;
+            delete coverageStore[filename];
+        }
+    }
+}
+
 function removeDir(dir) {
     fs.readdirSync(dir).forEach(function(name) {
         if (name !== '.' && name !== '..') {
@@ -15,6 +26,7 @@ function removeDir(dir) {
 }
 
 function removeDirTree(dir) {
+    clearStore();
     fs.readdirSync(dir).forEach(function(name) {
         if (name !== '.' && name !== '..') {
             removeDir(dir + '/' + name);
