@@ -261,6 +261,9 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
 
 function relatify(arr) {
     var retVal = [];
+    if (!Array.isArray(arr)) {
+        arr = [arr];
+    }
     arr.forEach(function(item, index) {
         if (item.indexOf('./') === 0 || item.indexOf('.\\') === 0) {
             retVal[index] = item.substring(2);

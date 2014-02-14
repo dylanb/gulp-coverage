@@ -79,7 +79,8 @@ describe('cover.js', function () {
             delete require.cache[require.resolve('../testsupport/test')];
             cover.cleanup();
             cover.init();
-            coverInst = cover.cover('**/test.js', path.join(process.cwd(), 'debug'));
+            // Note: the cover pattern is relative to the process.cwd()
+            coverInst = cover.cover('./testsupport/test.js', path.join(process.cwd(), 'debug'));
         });
         it('will cause the require function to instrument the file', function () {
             var test = require('../testsupport/test'),
