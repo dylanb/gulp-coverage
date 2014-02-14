@@ -42,8 +42,8 @@ function test () {
 function lint (done) {
     gulp.src(['test/**/*.js', 'index.js', 'contrib/cover.js', 'contrib/coverage_store.js', 'contrib/reporters/**/*.js'])
         .pipe(jshint())
-        .pipe(jshint.reporter('default')
-        .pipe(synchro(done)));
+        .pipe(jshint.reporter('default'))
+        .pipe(synchro(done));
 }
 
 function debug (cb) {
@@ -69,10 +69,12 @@ function mocha (done) {
         .pipe(mochaTask({
             reporter: 'spec'
         }))
-        .pipe(cover.report({
-            outFile: 'testoutput/blnkt.html'
-        })
-        .pipe(synchro(done)));
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'blnkt.html'
+        }))
+        .pipe(gulp.dest('./testoutput'))
+        .pipe(synchro(done));
 }
 
 function json (done) {
@@ -87,8 +89,8 @@ function json (done) {
         .pipe(cover.report({
             reporter: 'json',
             outFile: 'testoutput/json.json'
-        })
-        .pipe(synchro(done)));
+        }))
+        .pipe(synchro(done));
 }
 
 function jasmine (done) {
@@ -97,12 +99,17 @@ function jasmine (done) {
             pattern: ['**/test*']
         }))
         .pipe(jasmineTask())
-        .pipe(cover.report({
-            outFile: 'testoutput/jasmine.html'
-        })
-        .pipe(cover.enforce())
-        .pipe(synchro(done)));
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'jasmine.html'
+        }))
+        .pipe(gulp.dest('./testoutput'))
+        .pipe(synchro(done));
 }
+
+gulp.task('test', function() {
+  // Be sure to return the stream
+});
 
 function testchain (done) {
     gulp.src(['testsupport/srcchain.js'], { read: false })
