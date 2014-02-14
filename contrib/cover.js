@@ -106,10 +106,12 @@ FileCoverageData.prototype._blocks = function() {
  * @return {undefined}
  */
 FileCoverageData.prototype._prepare = function() {
+    // console.log('PREPARE');
     var data = require('./coverage_store').getStoreData(this.filename),
         rawData, store, index;
 
     data = '[' + data  + '{}]';
+    // console.log('DATA: ', data);
     rawData = JSON.parse(data);
     store = {nodes: {}, blocks: {}};
     rawData.forEach(function(item) {
@@ -177,6 +179,7 @@ FileCoverageData.prototype._prepare = function() {
  */
 
 FileCoverageData.prototype.stats = function() {
+    // console.log('STATS');
     this._prepare();
         var filedata = this.instrumentor.source.split('\n');
     var lineDetails = [],
@@ -299,6 +302,8 @@ var CoverageSession = function(pattern, debugDirectory) {
     }
     var originalRequire = this.originalRequire = require.extensions['.js'];
     var coverageData = this.coverageData = {};
+    var instrumentList = this.instrumentList = {};
+    // console.log('new coverageData');
     var pathToCoverageStore = path.resolve(path.resolve(__dirname), 'coverage_store.js').replace(/\\/g, '/');
     var templatePath = path.resolve(path.resolve(__dirname), 'templates', 'instrumentation_header.js');
     var template = fs.readFileSync(templatePath, 'utf-8');
@@ -319,6 +324,7 @@ var CoverageSession = function(pattern, debugDirectory) {
         var data = stripBOM(fs.readFileSync(filename, 'utf8').trim());
         data = data.replace(/^\#\!.*/, '');
 
+        instrumentList[filename] = true;
         var instrumented = instrument(data);
         coverageData[filename] = new FileCoverageData(filename, instrumented);
 
@@ -343,7 +349,13 @@ var CoverageSession = function(pattern, debugDirectory) {
  * @method release
  */
 CoverageSession.prototype.release = function() {
-  require.extensions['.js'] = this.originalRequire;
+    for (var att in this.instrumentList) {
+        // console.log('deleting: ', att);
+        if (require.cache.hasOwnProperty(att)) {
+            delete require.cache[att];
+        }
+    }
+    require.extensions['.js'] = this.originalRequire;
 };
 
 
@@ -707,10 +719,12 @@ CoverageSession.prototype.allStats = function () {
         coverageData = this.coverageData;
 
     totSloc = totCovered = totBloc = totStat = totStatCovered = totBlocCovered = 0;
+    // console.log(coverageData);
     Object.keys(coverageData).forEach(function(filename) {
         var fstats, lines, code, dataLines;
 
         fstats = coverageData[filename].stats();
+        // console.log('fstats: ', fstats, ', filename; ', filename);
         code = fstats.code;
         splitOverlaps(fstats.lineDetails, code);
         dataLines = linesWithData(fstats.lineDetails);
@@ -769,6 +783,7 @@ CoverageSession.prototype.allStats = function () {
             sboc: fstats.sboc,
             ssoc: fstats.ssoc
         };
+        // console.log('item: ', item);
         totStat += fstats.ssoc;
         totBloc += fstats.sboc;
         totSloc += fstats.sloc;
@@ -783,6 +798,7 @@ CoverageSession.prototype.allStats = function () {
     stats.coverage = totCovered / totSloc * 100;
     stats.statements = totStatCovered / totStat * 100;
     stats.blocks = totBlocCovered / totBloc * 100;
+    // console.log('stats: ', stats);
     return stats;
 };
 
@@ -831,7 +847,6 @@ var init = function() {
     }
     fs.mkdirSync(path.join(dataDir, directoryName));
     fd = fs.writeFileSync(path.join(process.cwd(), '.coverrun'), '{ "run" : "' + directoryName + '" }');
-    global.coverageData = {};
 };
 
 var cleanup = function() {

@@ -16,6 +16,9 @@ module.exports.instrument = function (options) {
     options = options || {};
     cover.cleanup();
     cover.init();
+    if (coverInst) {
+        coverInst.release();
+    }
     coverInst = cover.cover(options.pattern, options.debugDirectory);
 
     return through2.obj(function (file, encoding, cb) {
