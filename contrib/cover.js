@@ -259,6 +259,24 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
     return renderedSource;
 };
 
+function relatify(arr) {
+    var retVal = [];
+    arr.forEach(function(item, index) {
+        if (item.indexOf('./') === 0 || item.indexOf('.\\') === 0) {
+            retVal[index] = item.substring(2);
+        } else if (item.charAt(0) === '!') {
+            if (item.indexOf('./') === 1 || item.indexOf('.\\') === 1) {
+                retVal[index] = '!' + item.substring(3);
+            } else {
+                retVal[index] = item;
+            }
+        } else {
+            retVal[index] = item;
+        }
+    });
+    return retVal;
+}
+
 /**
  * @class CoverageSession
  * @constructor
@@ -266,6 +284,7 @@ var addInstrumentationHeader = function(template, filename, instrumented, covera
  * @param {String} debugDirectory - the name of the director to contain debug instrumentation files
  */
 var CoverageSession = function(pattern, debugDirectory) {
+    var normalizedPattern;
     function stripBOM(content) {
         // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
         // because the buffer-to-string conversion in `fs.readFileSync()`
@@ -280,13 +299,14 @@ var CoverageSession = function(pattern, debugDirectory) {
     var pathToCoverageStore = path.resolve(path.resolve(__dirname), 'coverage_store.js').replace(/\\/g, '/');
     var templatePath = path.resolve(path.resolve(__dirname), 'templates', 'instrumentation_header.js');
     var template = fs.readFileSync(templatePath, 'utf-8');
+    normalizedPattern = relatify(pattern);
     require.extensions['.js'] = function(module, filename) {
         var shortFilename;
         filename = filename.replace(/\\/g, '/');
 
         shortFilename = path.relative(process.cwd(), filename);
-        // console.log('filename: ', filename, ', shortFilename:', shortFilename, ', pattern: ', pattern, ', match: ', multimatch(shortFilename, pattern));
-        if (!multimatch(shortFilename, pattern).length) {
+        // console.log('filename: ', filename, ', shortFilename:', shortFilename, ', normalizedPattern: ', normalizedPattern, ', match: ', multimatch(shortFilename, pattern));
+        if (!multimatch(shortFilename, normalizedPattern).length) {
             return originalRequire(module, filename);
         }
         if (filename === pathToCoverageStore) {
