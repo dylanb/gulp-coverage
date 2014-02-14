@@ -120,7 +120,7 @@ module.exports.format = function (options) {
                 this.emit('error', new gutil.PluginError('gulp-coverage',
                     'Must call gather before calling enforce'));
                 cb();
-                return 
+                return;
             }
             file = new gutil.File({
                 base: path.join(__dirname, './'),
@@ -128,7 +128,7 @@ module.exports.format = function (options) {
                 path: path.join(__dirname, './', outfile),
                 contents: new Buffer(cover.reporters[reporter](data.coverage))
             });
-            file.coverage = data.coverage
+            file.coverage = data.coverage;
             this.push(file);
             cb();
         }, function (cb) {

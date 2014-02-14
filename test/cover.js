@@ -105,7 +105,7 @@ describe('cover.js', function () {
         test = require('../testsupport/test2');
         filename = require.resolve('../testsupport/test2');
         test();
-        filename = filename.replace(/\\/g, '/')
+        filename = filename.replace(/\\/g, '/');
         stats = coverInst.coverageData[filename].stats();
         it('will return the correct number of covered lines', function () {
             assert.equal(stats.lines, 7);
