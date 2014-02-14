@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 
-var fs = require('fs');
+var fs = require('fs'),
+	path = require('path');
 
 /**
  * Expose `HTMLCov`.
@@ -12,7 +13,7 @@ exports = module.exports = HTMLCov;
 
 function HTMLCov (coverageData, filename) {
 	var jade = require('jade'), 
-		file = __dirname + '/templates/coverage.jade',
+		file = path.join(__dirname, 'templates', 'coverage.jade'),
 		str = fs.readFileSync(file, 'utf8'),
 		fn = jade.compile(str, { filename: file }),
 		output = fn({
