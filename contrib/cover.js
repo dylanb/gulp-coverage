@@ -752,7 +752,7 @@ CoverageSession.prototype.allStats = function () {
             };
             sourceArray.push(lineStruct);
         });
-        filename = path.relative(process.cwd(), filename);
+        filename = path.relative(process.cwd(), filename).replace(/\\/g, '/');
         segments = filename.split('/');
         item = {
             filename: filename,
@@ -799,10 +799,14 @@ var cover = function(pattern, debugDirectory) {
 function removeDir(dirName) {
     fs.readdirSync(dirName).forEach(function(name) {
         if (name !== '.' && name !== '..') {
-            fs.unlinkSync(path.join(dirName, name));
+            try {
+                fs.unlinkSync(path.join(dirName, name));
+            } catch (err) {}
         }
     });
-    fs.rmdirSync(dirName);
+    try {
+        fs.rmdirSync(dirName);
+    } catch(err) {}
 }
 
 /**
