@@ -61,13 +61,13 @@ describe('gulp-coverage', function () {
             function (cb) {
                 var filename = require.resolve('../testsupport/test');
                 // Should have created the coverdata directory
-                assert.ok(fs.existsSync(process.cwd() + '/.coverdata'));
+                assert.ok(fs.existsSync(path.join(process.cwd(), '.coverdata')));
                 // Should have created the run directory
-                assert.ok(fs.existsSync(process.cwd() + '/.coverrun'));
-                run = JSON.parse(fs.readFileSync(process.cwd() + '/.coverrun')).run;
-                assert.ok(fs.existsSync(process.cwd() + '/.coverdata/' + run));
+                assert.ok(fs.existsSync(path.join(process.cwd(), '.coverrun')));
+                run = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.coverrun'))).run;
+                assert.ok(fs.existsSync(path.join(process.cwd(), '.coverdata', run)));
                 // Should have collected data
-                dataPath = path.join(process.cwd() + '/.coverdata/' + run, filename.replace(/[\/|\:|\\]/g, "_"));
+                dataPath = path.join(process.cwd(), '.coverdata', run, filename.replace(/[\/|\:|\\]/g, "_"));
                 assert.ok(fs.existsSync(dataPath));
                 cb();
                 done();
@@ -78,7 +78,7 @@ describe('gulp-coverage', function () {
 
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd() , 'debug')
             }))
                 .pipe(mocha({}))
                 .pipe(reader);
@@ -97,7 +97,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             }).on('error', function(err) {
                 assert.equal(err.message, 'Streaming not supported');
                 done();                
@@ -140,7 +140,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.report({
                 outFile: 'coverage.html',
@@ -168,7 +168,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['**/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.report({
                 outFile: 'coverage.html',
@@ -211,7 +211,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['./testsupport/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.gather()).pipe(reader);
             writer.write({
@@ -319,7 +319,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['testsupport/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.gather(
             )).pipe(cover.format(
@@ -344,7 +344,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['testsupport/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.gather(
             )).pipe(cover.format({
@@ -367,7 +367,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['testsupport/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.gather(
             )).pipe(cover.format({
@@ -391,7 +391,7 @@ describe('gulp-coverage', function () {
             });
             writer.pipe(cover.instrument({
                 pattern: ['testsupport/test*'],
-                debugDirectory: process.cwd() + '/debug/'
+                debugDirectory: path.join(process.cwd(), 'debug')
             })).pipe(mocha({
             })).pipe(cover.gather(
             )).pipe(cover.format(
