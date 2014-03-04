@@ -22,28 +22,17 @@ var lintDeps = [],
  * Define the task functions
  */
 
-function synchro (done) {
-    return through2.obj(function (data, enc, cb) {
-        cb();
-    },
-    function (cb) {
-        cb();
-        done();
-    });
-}
-
 function test () {
-    gulp.src(['test/**.js'], { read: false })
+    return gulp.src(['test/**.js'], { read: false })
         .pipe(mochaTask({
             reporter: 'spec'
         }));
 }
 
-function lint (done) {
-    gulp.src(['test/**/*.js', 'index.js', 'contrib/cover.js', 'contrib/coverage_store.js', 'contrib/reporters/**/*.js'])
+function lint () {
+    return gulp.src(['test/**/*.js', 'index.js', 'contrib/cover.js', 'contrib/coverage_store.js', 'contrib/reporters/**/*.js'])
         .pipe(jshint())
-        .pipe(jshint.reporter('default'))
-        .pipe(synchro(done));
+        .pipe(jshint.reporter('default'));
 }
 
 function debug (cb) {
@@ -60,8 +49,8 @@ function debug (cb) {
     cb();
 }
 
-function mocha (done) {
-    gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
+function mocha () {
+    return gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
             debugDirectory: 'debug'
@@ -73,12 +62,11 @@ function mocha (done) {
         .pipe(cover.format({
             outFile: 'blnkt.html'
         }))
-        .pipe(gulp.dest('./testoutput'))
-        .pipe(synchro(done));
+        .pipe(gulp.dest('./testoutput'));
 }
 
-function json (done) {
-    gulp.src(['testsupport/src.js', 'testsupprt/src3.js'], { read: false })
+function json () {
+    return gulp.src(['testsupport/src.js', 'testsupprt/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
             debugDirectory: 'debug'
@@ -89,12 +77,11 @@ function json (done) {
         .pipe(cover.report({
             reporter: 'json',
             outFile: 'testoutput/json.json'
-        }))
-        .pipe(synchro(done));
+        }));
 }
 
-function jasmine (done) {
-    gulp.src('testsupport/srcjasmine.js')
+function jasmine () {
+    return gulp.src('testsupport/srcjasmine.js')
         .pipe(cover.instrument({
             pattern: ['**/test*']
         }))
@@ -103,16 +90,15 @@ function jasmine (done) {
         .pipe(cover.format({
             outFile: 'jasmine.html'
         }))
-        .pipe(gulp.dest('./testoutput'))
-        .pipe(synchro(done));
+        .pipe(gulp.dest('./testoutput'));
 }
 
 gulp.task('test', function() {
   // Be sure to return the stream
 });
 
-function testchain (done) {
-    gulp.src(['testsupport/srcchain.js'], { read: false })
+function testchain () {
+    return gulp.src(['testsupport/srcchain.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/chain.js'],
             debugDirectory: 'debug'
@@ -129,8 +115,7 @@ function testchain (done) {
             outFile: 'chain.json',
             reporter: 'json'
         }))
-        .pipe(gulp.dest('./testoutput'))
-        .pipe(synchro(done));
+        .pipe(gulp.dest('./testoutput'));
 }
 
 /*
