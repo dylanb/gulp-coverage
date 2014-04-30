@@ -9,5 +9,6 @@ module.exports = function () {
         10+
         0.5
     );
+    return chain;
 };
 
