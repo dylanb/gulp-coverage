@@ -7,7 +7,7 @@ Gulp coverage reporting for Node.js that is independent of the test runner
 gulp-coverage generates block, line, chainable and statement coverage for Node.js JavaScript files. This is equivalent to function, statement, branch and "modified condition/decision" coverage, where a "statement" is equivalent to a "modified condition/decision". The HTML report gives summary information for the block, line and statement covereage across all the files as well as for each file.
 
 ##Chainables
-The chainable coverage supports Array-like chainables and will record misses where the chained member calls both receive and result-in an empty list.
+The chainable coverage supports Array-like chainables and will record misses where the chained member calls both receive and result-in an empty array.
 
 ##HTML report
 For each covered file, a chain of links is built allowing you to click through from the summary to the first and then all subsequent instances of each type of miss (line misses and statement misses).
