@@ -21,7 +21,7 @@
     }; 
     <%= instrumented.names.intro %> = function(id, obj) {
         // console.log('__intro: ', id, ', obj.__instrumented_miss: ', obj.__instrumented_miss, ', obj.length: ', obj.length);
-        Object.defineProperty && Object.defineProperty(obj, '__instrumented_miss', {enumerable: false, writable: true});
+        typeof obj === 'object' && Object.defineProperty && Object.defineProperty(obj, '__instrumented_miss', {enumerable: false, writable: true});
         obj.__instrumented_miss = obj.__instrumented_miss || [];
         if ('undefined' !== typeof obj && null !== obj && 'undefined' !== typeof obj.__instrumented_miss) {
             if (obj.length === 0) {
