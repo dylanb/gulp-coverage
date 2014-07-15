@@ -25,16 +25,15 @@ To instrument and report on a file using Mocha as your test runner:
     cover = require('gulp-coverage');
 
     gulp.task('test', function () {
-        gulp.src(['src.js', 'src2.js'], { read: false })
-            .pipe(cover.instrument({
-                pattern: ['**/test*'],
-                debugDirectory: 'debug'
-            }))
-            .pipe(mocha({
-            }))
-            .pipe(cover.report({
-                outFile: 'coverage.html'
-            }));
+        return gulp.src(['src.js', 'src2.js'], { read: false })
+                .pipe(cover.instrument({
+                    pattern: ['**/test*'],
+                    debugDirectory: 'debug'
+                }))
+                .pipe(mocha())
+                .pipe(cover.report({
+                    outFile: 'coverage.html'
+                }));
     });
 ```
 
@@ -45,14 +44,14 @@ To instrument and report using Jasmine as your test system:
     cover = require('gulp-coverage');
 
     gulp.task('jasmine', function () {
-        gulp.src('srcjasmine.js')
-            .pipe(cover.instrument({
-                pattern: ['**/test*'],
-                debugDirectory: 'debug'
-            }))
-            .pipe(jasmine())
-            .pipe(cover.report({
-                outFile: 'jasmine.html'
+        return gulp.src('srcjasmine.js')
+                .pipe(cover.instrument({
+                    pattern: ['**/test*'],
+                    debugDirectory: 'debug'
+                }))
+                .pipe(jasmine())
+                .pipe(cover.report({
+                    outFile: 'jasmine.html'
             }));
     });
 ```
