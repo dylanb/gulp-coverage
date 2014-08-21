@@ -406,4 +406,33 @@ describe('gulp-coverage', function () {
             writer.end();            
         });
     });
+    it('should accept array of options', function (done) {
+        var expected = [
+            path.resolve(process.cwd(), 'coverage.html'),
+            path.resolve(process.cwd(), 'coverage.json')
+        ];
+        var actual = [];
+        reader = through2.obj(function (chunk, enc, cb) {
+            actual.push(chunk.path);
+            cb();
+        },
+        function (cb) {
+            assert.deepEqual(expected, actual);
+            cb();
+            done();
+        });
+        writer.pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: path.join(process.cwd(), 'debug')
+        })).pipe(mocha({
+        })).pipe(cover.gather({
+        })).pipe(cover.format([
+            'html', { reporter: 'json' }
+        ])).pipe(reader);
+
+        writer.write({
+            path: require.resolve('../testsupport/src.js')
+        });
+        writer.end();
+    });
 });
