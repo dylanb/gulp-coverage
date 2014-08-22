@@ -153,13 +153,35 @@ You must call `gather` prior to calling `format`.
 
 ### options
 
-The task takes one optional argument that contains the options. There are 2 options, here are the default values:
+The task takes one optional argument that is either an object that contains the options, or is an array of objects that contain options. If the argument is an array, then two vinyl files will be created and added to the gulp stream. 
+
+There are 2 options, here are the default values:
 
 ```
   {
     reporter: 'html',
     outFile: 'coverage.html'
   }
+```
+
+Calling format with the following arguments will all create two vinyl files in the gulp stream that have a path of coverage.html and coverage.json respectively:
+
+#### Multiple Formats Example 1
+
+```
+  [ { reporter: 'html' }, { reporter: 'json' } ]
+```
+
+#### Multiple Formats Example 2
+
+```
+  [ { reporter: 'html', outFile: 'coverage.html' }, { reporter: 'json', outFile: 'coverage.json' } ]
+```
+
+#### Multiple Formats Example 3
+
+```
+  [ 'html', 'json']
 ```
 
 ## The Report Task (Deprecated)

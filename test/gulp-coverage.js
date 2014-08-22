@@ -435,4 +435,92 @@ describe('gulp-coverage', function () {
         });
         writer.end();
     });
+    it('should take an array of just one string', function (done) {
+        var expected = [
+            path.resolve(process.cwd(), 'coverage.html')
+        ];
+        var actual = [];
+        reader = through2.obj(function (chunk, enc, cb) {
+            actual.push(chunk.path);
+            cb();
+        },
+        function (cb) {
+            assert.deepEqual(expected, actual);
+            cb();
+            done();
+        });
+        writer.pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: path.join(process.cwd(), 'debug')
+        })).pipe(mocha({
+        })).pipe(cover.gather({
+        })).pipe(cover.format([
+            'html'
+        ])).pipe(reader);
+
+        writer.write({
+            path: require.resolve('../testsupport/src.js')
+        });
+        writer.end();
+    });
+    it('should accept array of options, with different outFile settings', function (done) {
+        var expected = [
+            path.resolve(process.cwd(), 'blah.html'),
+            path.resolve(process.cwd(), 'bugger.json')
+        ];
+        var actual = [];
+        reader = through2.obj(function (chunk, enc, cb) {
+            actual.push(chunk.path);
+            cb();
+        },
+        function (cb) {
+            assert.deepEqual(expected, actual);
+            cb();
+            done();
+        });
+        writer.pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: path.join(process.cwd(), 'debug')
+        })).pipe(mocha({
+        })).pipe(cover.gather({
+        })).pipe(cover.format([
+            { reporter: 'html', outFile: 'blah.html'},
+            { reporter: 'json', outFile: 'bugger.json' }
+        ])).pipe(reader);
+
+        writer.write({
+            path: require.resolve('../testsupport/src.js')
+        });
+        writer.end();
+    });
+    it('should accept array of options, with one default and one explicit outFile settings', function (done) {
+        var expected = [
+            path.resolve(process.cwd(), 'coverage.html'),
+            path.resolve(process.cwd(), 'bugger.json')
+        ];
+        var actual = [];
+        reader = through2.obj(function (chunk, enc, cb) {
+            actual.push(chunk.path);
+            cb();
+        },
+        function (cb) {
+            assert.deepEqual(expected, actual);
+            cb();
+            done();
+        });
+        writer.pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: path.join(process.cwd(), 'debug')
+        })).pipe(mocha({
+        })).pipe(cover.gather({
+        })).pipe(cover.format([
+            { reporter: 'html' },
+            { reporter: 'json', outFile: 'bugger.json' }
+        ])).pipe(reader);
+
+        writer.write({
+            path: require.resolve('../testsupport/src.js')
+        });
+        writer.end();
+    });
 });
