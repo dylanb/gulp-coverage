@@ -113,9 +113,8 @@ module.exports.enforce = function (options) {
 };
 
 module.exports.format = function (options) {
-    options = options || {};
-    var reporter = options.reporter || 'html';
-    var outfile = options.outFile || 'coverage.' + reporter;
+    var reporters = options || [{}];
+    if (!Array.isArray(reporters)) reporters = [reporters];
     return through2.obj(
         function (data, encoding, cb) {
             var file;
@@ -125,14 +124,19 @@ module.exports.format = function (options) {
                 cb();
                 return;
             }
-            file = new gutil.File({
-                base: path.join(__dirname, './'),
-                cwd: __dirname,
-                path: path.join(__dirname, './', outfile),
-                contents: new Buffer(cover.reporters[reporter](data.coverage))
-            });
-            file.coverage = data.coverage;
-            this.push(file);
+            reporters.forEach(function(opts) {
+                if (typeof opts === 'string') opts = { reporter: opts };
+                var reporter = opts.reporter || 'html';
+                var outfile = opts.outFile || 'coverage.' + reporter;
+                file = new gutil.File({
+                    base: path.join(__dirname, './'),
+                    cwd: __dirname,
+                    path: path.join(__dirname, './', outfile),
+                    contents: new Buffer(cover.reporters[reporter](data.coverage))
+                });
+                file.coverage = data.coverage;
+                this.push(file);
+            }, this);
             cb();
         }, function (cb) {
             cb();
