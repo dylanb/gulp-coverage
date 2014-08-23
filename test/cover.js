@@ -162,4 +162,50 @@ describe('cover.js', function () {
             assert.equal(stats.lineDetails[6].statementDetails[2].count, 0);
         });
     });
+    describe('coverInst.allStats()', function () {
+        var test, coverInst, stats, filename;
+        delete require.cache[require.resolve('../testsupport/test2')];
+        cover.cleanup();
+        cover.init();
+        coverInst = cover.cover('**/testsupport/*.js');
+        test = require('../testsupport/test2');
+        filename = require.resolve('../testsupport/test2');
+        test();
+        stats = coverInst.allStats();
+        // console.log(stats);
+        it('will return the uncovered files', function () {
+            assert.deepEqual(stats.uncovered, [
+                'testsupport/chain.js',
+                 'testsupport/chainable.js',
+                 'testsupport/src.js',
+                 'testsupport/src2.js',
+                 'testsupport/src3.js',
+                 'testsupport/srcchain.js',
+                 'testsupport/srcjasmine.js',
+                 'testsupport/test.js',
+                 'testsupport/test2.js' ]);
+        });
+        it('will return the correct number of code lines', function () {
+            assert.equal(stats.sloc, 9);
+        });
+        it('will return the correct number of statements', function () {
+            assert.equal(stats.ssoc, 13);
+        });
+        it('will return the correct number of blocks', function () {
+            assert.equal(stats.sboc, 4);
+        });
+        it('will return the correct coverage', function () {
+            assert.equal(Math.floor(stats.coverage), 77);
+        });
+        it('will return the correct statements coverage', function () {
+            assert.equal(Math.floor(stats.statements), 69);
+        });
+        it('will return the correct blocks coverage', function () {
+            assert.equal(Math.floor(stats.blocks), 75);
+        });
+        it('will return the file data', function () {
+            assert.equal(stats.files.length, 1);
+        });
+
+    });
 });

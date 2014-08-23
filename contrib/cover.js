@@ -307,7 +307,7 @@ var CoverageSession = function(pattern, debugDirectory) {
     var pathToCoverageStore = path.resolve(path.resolve(__dirname), 'coverage_store.js').replace(/\\/g, '/');
     var templatePath = path.resolve(path.resolve(__dirname), 'templates', 'instrumentation_header.js');
     var template = fs.readFileSync(templatePath, 'utf-8');
-    normalizedPattern = relatify(pattern);
+    this.pattern = normalizedPattern = relatify(pattern);
     require.extensions['.js'] = function(module, filename) {
         var shortFilename;
         filename = filename.replace(/\\/g, '/');
@@ -668,9 +668,27 @@ function linesWithData(lines) {
     return unique;
 }
 
+function getAllFiles(dir) {
+    var retVal = [],
+        subDir,
+        files = fs.readdirSync(dir);
+
+    //console.log('precessing:', dir);
+    files.forEach(function (file) {
+        try {
+            fs.readdirSync(path.join(dir, file));
+            subDir = getAllFiles(path.join(dir, file));
+            retVal = retVal.concat(subDir);
+        } catch (err) {
+            retVal.push(path.relative(process.cwd(),path.join(dir, file)));
+        }
+    });
+    return retVal;
+}
+
 /**
  * Generate a coverage statistics structure for all of the instrumented files given all the data that
- * has been geenrated for them to date
+ * has been generated for them to date
  * {
  *        sloc: Integer - how many source lines of code there were in total
  *        ssoc: Integer - how many statements of code there were in total
@@ -714,16 +732,34 @@ function linesWithData(lines) {
  */
 CoverageSession.prototype.allStats = function () {
     var stats = { files : []},
+        allFiles = [],
+        that = this,
+        shouldBeCovered = [],
         filename, item, lines, sourceArray, segments,
         totSloc, totCovered, totBloc, totStat, totStatCovered, totBlocCovered,
         coverageData = this.coverageData;
 
     totSloc = totCovered = totBloc = totStat = totStatCovered = totBlocCovered = 0;
+    allFiles = getAllFiles(process.cwd());
+    allFiles.forEach(function (filename) {
+        shortFilename = path.relative(process.cwd(), filename);
+        //console.log('filename: ', filename, ', shortFilename:', shortFilename, ', this.pattern: ', that.pattern, ', match: ', multimatch(shortFilename, that.pattern));
+        if (multimatch(shortFilename, that.pattern).length &&
+            shortFilename.indexOf('node_modules') === -1) {
+            shouldBeCovered.push(shortFilename);
+        }
+    });
+
+    // console.log(shouldBeCovered);
     // console.log(coverageData);
     Object.keys(coverageData).forEach(function(filename) {
-        var fstats, lines, code, dataLines;
+        var fstats, lines, code, dataLines, shortFilename;
 
         fstats = coverageData[filename].stats();
+        shortFilename = path.relative(process.cwd(), filename);
+        if (shouldBeCovered.indexOf(shortFilename) === 0) {
+            shouldBeCovered.splice(shouldBeCovered.indexOf(shortFilename), 1);
+        }
         // console.log('fstats: ', fstats, ', filename; ', filename);
         code = fstats.code;
         splitOverlaps(fstats.lineDetails, code);
@@ -798,7 +834,9 @@ CoverageSession.prototype.allStats = function () {
     stats.coverage = totCovered / totSloc * 100;
     stats.statements = totStatCovered / totStat * 100;
     stats.blocks = totBlocCovered / totBloc * 100;
+    stats.uncovered = shouldBeCovered;
     // console.log('stats: ', stats);
+    console.log(shouldBeCovered);
     return stats;
 };
 
