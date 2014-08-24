@@ -91,6 +91,7 @@ The format of the JSON structure is a Modified LCOV format. The format has been 
          statements: Float - percentage of statements covered
          blocks: Float: percentage of blocks covered
          files: Array[Object] - array of information about each file
+         uncovered: Array[String] - array of the files that match the pattern but were not tested at all
   }
 ```
 

@@ -59,3 +59,10 @@ html
                               span.offscreen= ' not covered '
                             = segment.code
                       td.action
+        for missed in cov.uncovered
+          .file
+            h2(id=missed)= missed
+            .stats(class=coverageClass(0))
+              .percentage #{0}% line coverage
+              .statements #{0}% statement coverage
+              .blocks #{0}% block coverage
