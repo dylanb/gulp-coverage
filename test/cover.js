@@ -182,8 +182,7 @@ describe('cover.js', function () {
                  'testsupport/src3.js',
                  'testsupport/srcchain.js',
                  'testsupport/srcjasmine.js',
-                 'testsupport/test.js',
-                 'testsupport/test2.js' ]);
+                 'testsupport/test.js' ]);
         });
         it('will return the correct number of code lines', function () {
             assert.equal(stats.sloc, 9);

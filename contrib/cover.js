@@ -675,12 +675,13 @@ function getAllFiles(dir) {
 
     //console.log('precessing:', dir);
     files.forEach(function (file) {
+        var fullPath = path.join(dir, file);
         try {
-            fs.readdirSync(path.join(dir, file));
-            subDir = getAllFiles(path.join(dir, file));
+            fs.readdirSync(fullPath);
+            subDir = getAllFiles(fullPath);
             retVal = retVal.concat(subDir);
         } catch (err) {
-            retVal.push(path.relative(process.cwd(),path.join(dir, file)));
+            retVal.push(path.relative(process.cwd(),fullPath));
         }
     });
     return retVal;
@@ -697,6 +698,7 @@ function getAllFiles(dir) {
  *        statements: Float - percentage of statements covered
  *        blocks: Float: percentage of blocks covered
  *        files: Array[Object] - array of information about each file
+ *        uncovered: Array[String] - array of the files that match the patterns that were not tested at all
  * }
  *
  * Each file has the following structure
@@ -753,12 +755,13 @@ CoverageSession.prototype.allStats = function () {
     // console.log(shouldBeCovered);
     // console.log(coverageData);
     Object.keys(coverageData).forEach(function(filename) {
-        var fstats, lines, code, dataLines, shortFilename;
+        var fstats, lines, code, dataLines, shortFilename, index;
 
         fstats = coverageData[filename].stats();
         shortFilename = path.relative(process.cwd(), filename);
-        if (shouldBeCovered.indexOf(shortFilename) === 0) {
-            shouldBeCovered.splice(shouldBeCovered.indexOf(shortFilename), 1);
+        index = shouldBeCovered.indexOf(shortFilename);
+        if (index !== -1) {
+            shouldBeCovered.splice(index, 1);
         }
         // console.log('fstats: ', fstats, ', filename; ', filename);
         code = fstats.code;
