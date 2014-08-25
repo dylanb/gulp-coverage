@@ -836,7 +836,7 @@ CoverageSession.prototype.allStats = function () {
     stats.blocks = totBlocCovered / totBloc * 100;
     stats.uncovered = shouldBeCovered;
     // console.log('stats: ', stats);
-    console.log(shouldBeCovered);
+    // console.log(shouldBeCovered);
     return stats;
 };
 

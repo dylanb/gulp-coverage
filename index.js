@@ -83,7 +83,8 @@ module.exports.enforce = function (options) {
     options = options || {};
     var statements = options.statements || 100,
         blocks = options.blocks || 100,
-        lines = options.lines || 100;
+        lines = options.lines || 100,
+        uncovered = options.uncovered;
     return through2.obj(
         function (data, encoding, cb) {
             if (!data.coverage) {
@@ -105,6 +106,11 @@ module.exports.enforce = function (options) {
                 this.emit('error', new gutil.PluginError('gulp-coverage',
                     'block coverage of ' + data.coverage.blocks +
                     ' does not meet the threshold of ' + blocks));
+            }
+            if (data.coverage.uncovered && uncovered !== undefined && data.coverage.uncovered.length > uncovered) {
+                this.emit('error', new gutil.PluginError('gulp-coverage',
+                    'uncovered files of ' + data.coverage.uncovered.length +
+                    ' does not meet the threshold of ' + uncovered));
             }
             cb();
         }, function (cb) {

@@ -141,9 +141,13 @@ If you would like to specify thresholds lower than 100%, pass in the thresholds 
   options : {
       statements: 100,
       blocks: 100,
-      lines: 100
+      lines: 100,
+      uncovered: undefined
   }
 ```
+
+If uncovered is undefined, no threshold will be defined, otherwise it must be an integer of the number of files that are allowed to not be covered. Setting this to 0 will enforce that there are no uncovered files that match the patterm passed into the instrument task.
+
 ## The Format Task
 
 The `format` task can be used to generate a textual, formatted version of the coverage data and emit this to the Gulp stream. By default, it will call the 'html' formatter (currently only `'html'` and `'json'` are supported). It will add the formatted text the stream. After calling both `gather` and `format`, the stream will contain a vinyl file with an additional attribute called `coverage`, that contains the JSON formatted data.

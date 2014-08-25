@@ -289,6 +289,53 @@ describe('gulp-coverage', function () {
             });
             writer.end();
         });
+        it('will emit an error if the uncovered files count is above the appropriate threshold', function (done) {
+            writer.pipe(cover.enforce({
+                statements: 100,
+                lines: 1,
+                blocks: 1,
+                uncovered: 1
+            }).on('error', function(err) {
+                assert.equal(err.message.indexOf('uncovered files of'), 0);
+                done();
+            }));
+            writer.push({
+                coverage: {
+                    statements: 100,
+                    coverage: 100,
+                    blocks: 100,
+                    uncovered: ['one/file/name.js', 'second/file/name.js']
+                }
+            });
+            writer.end();
+        });
+        it('will NOT emit an error if an uncovered threshold is not explicitly provided', function (done) {
+            var finished = false;
+            writer.pipe(cover.enforce({
+                statements: 100,
+                lines: 1,
+                blocks: 1
+            }).on('error', function(err) {
+                assert.ok(false);
+                finished = true;
+                done();
+            }));
+            writer.push({
+                coverage: {
+                    statements: 100,
+                    coverage: 100,
+                    blocks: 100,
+                    uncovered: ['one/file/name.js', 'second/file/name.js']
+                }
+            });
+            writer.end();
+            setTimeout(function () {
+                if (!finished) {
+                    assert.ok(true);
+                    done();
+                }
+            }, 100);
+        });
     });
     describe('format', function () {
         it('should throw if not passed the correct data', function (done) {
@@ -398,7 +445,8 @@ describe('gulp-coverage', function () {
             )).pipe(cover.enforce({
                 statements: 80,
                 lines: 83,
-                blocks: 60
+                blocks: 60,
+                uncovered: 1
             })).pipe(reader);
             writer.write({
                 path: require.resolve('../testsupport/src.js')
