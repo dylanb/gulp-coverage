@@ -138,13 +138,14 @@ Instrumentor.prototype.instrument = function(code) {
     this.source = code;
     
     // We wrap the code with a function to make sure it is compliant with node
-    var header = "(function() {";
-    var footer = "\n})();"
+    var header = "";
+    var footer = ""
     var wrappedCode = header + code + footer;
     
     // Parse the wrapped code
     var tree = esprima.parse(wrappedCode, {range: true, loc: true, comment: true});
 
+    //console.log(JSON.stringify(tree, null, " "));
     var ignoredLines = {};
     var ignoreRe = /^\s*cover\s*:\s*false\s*$/
     tree.comments.
@@ -155,8 +156,7 @@ Instrumentor.prototype.instrument = function(code) {
             ignoredLines[commentNode.loc.start.line] = true;
         });
 
-    // We only "instrument" the original part, which is in this sub-statement
-    this.wrap(tree.body[0].expression.callee.body.body, ignoredLines);
+    this.wrap(tree, ignoredLines);
 
     // We need to adjust the nodes for everything on the first line,
     // such that their location statements will start at 1 and not at header.length

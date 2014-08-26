@@ -16,7 +16,8 @@ var lintDeps = [],
     mochaDeps = [],
     jsonDeps = [],
     jasmineDeps = [],
-    testchainDeps = []
+    testchainDeps = [],
+    rewireDeps = [];
 
 /*
  * Define the task functions
@@ -61,6 +62,22 @@ function mocha () {
         .pipe(cover.gather())
         .pipe(cover.format({
             outFile: 'blnkt.html'
+        }))
+        .pipe(gulp.dest('./testoutput'));
+}
+
+function rewire () {
+    return gulp.src(['testsupport/rewire.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['testsupport/myModule.js'],
+            debugDirectory: 'debug'
+        }))
+        .pipe(mochaTask({
+            reporter: 'spec'
+        }))
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'rewire.html'
         }))
         .pipe(gulp.dest('./testoutput'));
 }
@@ -123,6 +140,7 @@ function testchain () {
  */
 
 function setup () {
+    gulp.task('rewire', rewireDeps, rewire);
     gulp.task('test', testDeps, test);
     gulp.task('lint', lintDeps, lint);
     gulp.task('mocha', mochaDeps, mocha);
@@ -137,6 +155,7 @@ function setup () {
 
 gulp.task('default', function() {
     // Setup the chain of dependencies
+    testchainDeps = ['rewire'];
     jasmineDeps = ['testchain'];
     jsonDeps = ['jasmine'];
     mochaDeps = ['json'];
