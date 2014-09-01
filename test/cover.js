@@ -172,7 +172,7 @@ describe('cover.js', function () {
         filename = require.resolve('../testsupport/test2');
         test();
         stats = coverInst.allStats();
-        console.log(stats);
+        // console.log(stats);
         it('will return the uncovered files', function () {
             assert.deepEqual(stats.uncovered, [
                 'testsupport/chain.js',
