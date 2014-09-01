@@ -902,6 +902,7 @@ module.exports = {
     cleanup: cleanup,
     reporters: {
         html:   require('./reporters/html'),
+        lcov:   require('./reporters/lcov'),
         json:   require('./reporters/json')
     }
 };

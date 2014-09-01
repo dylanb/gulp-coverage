@@ -4,6 +4,7 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     exec = require('child_process').exec,
     jasmineTask = require('gulp-jasmine'),
+    coverallsTask = require('gulp-coveralls'),
     through2 = require('through2');
 
 /*
@@ -17,7 +18,8 @@ var lintDeps = [],
     jsonDeps = [],
     jasmineDeps = [],
     testchainDeps = [],
-    rewireDeps = [];
+    rewireDeps = [],
+    coverallsDeps = [];
 
 /*
  * Define the task functions
@@ -63,6 +65,23 @@ function mocha () {
         .pipe(cover.format({
             outFile: 'blnkt.html'
         }))
+        .pipe(gulp.dest('./testoutput'));
+}
+
+function coveralls () {
+    return gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['**/test*'],
+            debugDirectory: 'debug'
+        }))
+        .pipe(mochaTask({
+            reporter: 'spec'
+        }))
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            reporter: 'lcov'
+        }))
+        .pipe(coverallsTask())
         .pipe(gulp.dest('./testoutput'));
 }
 
@@ -140,6 +159,7 @@ function testchain () {
  */
 
 function setup () {
+    gulp.task('coveralls', coverallsDeps, coveralls);
     gulp.task('rewire', rewireDeps, rewire);
     gulp.task('test', testDeps, test);
     gulp.task('lint', lintDeps, lint);
@@ -155,6 +175,7 @@ function setup () {
 
 gulp.task('default', function() {
     // Setup the chain of dependencies
+    rewireDeps = ['coveralls'];
     testchainDeps = ['rewire'];
     jasmineDeps = ['testchain'];
     jsonDeps = ['jasmine'];
