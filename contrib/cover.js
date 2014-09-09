@@ -432,7 +432,10 @@ function getSegments(code, lines, count, statementDetails) {
     // Will now be sorted in start order with end as the second sort criterium
     splintered = [];
     for ( i = 0; i < sd.length; i++) {
-        var us = new Array(sd[i].end - sd[i].start + 1);
+        
+        (sd[i].end - sd[i].start + 1) > 0 ? size = sd[i].end - sd[i].start + 1 : size = 0;
+        var us = new Array(size);
+
         for (k = sd[i].end - sd[i].start; k >= 0; k--) {
             us[k] = 1;                
         }
