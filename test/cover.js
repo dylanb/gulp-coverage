@@ -126,7 +126,7 @@ describe('cover.js', function () {
             assert.equal(stats.sboc, 4);
         });
         it('will return the lines of code as an array', function () {
-            assert.equal(stats.code.length, 32);
+            assert.equal(stats.code.length, 33);
         });
         it('will return the code correctly', function () {
             var codeArray = fs.readFileSync(filename).toString().trim().split('\n');

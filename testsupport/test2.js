@@ -15,6 +15,7 @@ module.exports = function () {
     }
     return retVal;
 };
+var uncovered = true; //cover:false
 //#JSCOVERAGE_IF
 if (false) {
     var retVal = 19;
