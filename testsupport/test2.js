@@ -6,9 +6,27 @@ module.exports = function () {
         if (false) {
             retVal/0;
             retVal += 1;
+            //#JSCOVERAGE_IF
+            retVal += 2;
+            //#JSCOVERAGE_ENDIF
         } else {
             retVal = retVal;
         }
     }
     return retVal;
 };
+//#JSCOVERAGE_IF
+if (false) {
+    var retVal = 19;
+}
+//#JSCOVERAGE_IF 0
+//#JSCOVERAGE_IF
+if (false) {
+    retVal += 1;
+}
+if (false) {
+    retVal += 1;
+}
+if (false) {
+    retVal += 1;
+}

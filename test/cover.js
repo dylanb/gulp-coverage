@@ -126,14 +126,14 @@ describe('cover.js', function () {
             assert.equal(stats.sboc, 4);
         });
         it('will return the lines of code as an array', function () {
-            assert.equal(stats.code.length, 14);
+            assert.equal(stats.code.length, 32);
         });
         it('will return the code correctly', function () {
             var codeArray = fs.readFileSync(filename).toString().trim().split('\n');
             assert.deepEqual(stats.code, codeArray);
         });
         it('will return the correct lineDetails sparse array', function () {
-            assert.equal(stats.lineDetails.length, 14);
+            assert.equal(stats.lineDetails.length, 17);
             assert.equal(stats.lineDetails.filter(function(item){return item;}).length, 9);
         });
         it('will return the correct count for lines that were not covered', function () {
@@ -141,7 +141,7 @@ describe('cover.js', function () {
         });
         it('will return the correct count for lines that are blocks around other code', function () {
             assert.equal(stats.lineDetails[0].count, 1);
-            assert.equal(stats.lineDetails[13].count, 1);
+            assert.equal(stats.lineDetails[16].count, 1);
         });
         it('will return the correct line and position information for the statements', function () {
             assert.equal(stats.lineDetails[4].statementDetails[0].loc.start.line, 5);

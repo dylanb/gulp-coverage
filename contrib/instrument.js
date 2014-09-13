@@ -137,17 +137,17 @@ Instrumentor.prototype.filter = function(action) {
 Instrumentor.prototype.instrument = function(code) {
     this.source = code;
     
-    // We wrap the code with a function to make sure it is compliant with node
-    var header = "";
-    var footer = ""
-    var wrappedCode = header + code + footer;
-    
-    // Parse the wrapped code
-    var tree = esprima.parse(wrappedCode, {range: true, loc: true, comment: true});
+    // Parse the code
+    var tree = esprima.parse(code, {range: true, loc: true, comment: true});
 
     //console.log(JSON.stringify(tree, null, " "));
     var ignoredLines = {};
-    var ignoreRe = /^\s*cover\s*:\s*false\s*$/
+    var ignoreRe = /^\s*cover\s*:\s*false\s*$/;
+    var ignoreBeginJSCRe = /^\s*#JSCOVERAGE_IF\s*$/;
+    var ignoreEndJSCRe = /^\s*(#JSCOVERAGE_IF\s*0)|(#JSCOVERAGE_ENDIF)\s*$/;
+    var begin, end, i, j;
+
+    // Handle our ignore comment format
     tree.comments.
         filter(function(commentNode) {
             return ignoreRe.test(commentNode.value);
@@ -155,6 +155,58 @@ Instrumentor.prototype.instrument = function(code) {
         forEach(function(commentNode) {
             ignoredLines[commentNode.loc.start.line] = true;
         });
+
+    // Handle the JSCoverage ignore comment format
+    var state = "end";
+    var JSCComments = tree.comments.filter(function(commentNode) {
+        return ignoreBeginJSCRe.test(commentNode.value) ||
+            ignoreEndJSCRe.test(commentNode.value);
+    }).map(function(commentNode) {
+        if (ignoreBeginJSCRe.test(commentNode.value)) {
+            return {
+                type: "begin",
+                node: commentNode
+            };
+        } else {
+            return {
+                type: "end",
+                node: commentNode
+            };
+        }
+    }).filter(function(item) {
+        if (state === "end" && item.type === "begin") {
+            state = "begin";
+            return true;
+        } else if (state === "begin" && item.type === "end") {
+            state = "end";
+            return true;
+        }
+        return false;
+    });
+
+    if (JSCComments.length && JSCComments[JSCComments.length - 1].type !== "end") {
+        // The file ends with an open ignore. Need to estimate the file length
+        // and add a synthetic node to the end of the array
+        JSCComments.push({
+            type: "end",
+            node: {
+                loc: {
+                    start: {
+                        line: code.split('\n').length
+                    }
+                }
+            }
+        });
+    }
+
+    for (i = 0; i < JSCComments.length; i += 2) {
+        begin = JSCComments[i].node.loc.start.line;
+        end = JSCComments[i + 1].node.loc.start.line;
+
+        for (j = begin; j <= end; j++) {
+            ignoredLines[j] = true;
+        }
+    }
 
     this.wrap(tree, ignoredLines);
 
@@ -180,10 +232,10 @@ Instrumentor.prototype.instrument = function(code) {
                 
                 // Adjust the columns
                 if (node.loc.start.line == 1) {
-                    node.loc.start.column = node.loc.start.column - header.length;
+                    node.loc.start.column = node.loc.start.column;
                 }
                 if (node.loc.end.line == 1) {
-                    node.loc.end.column = node.loc.end.column - header.length;
+                    node.loc.end.column = node.loc.end.column;
                 }
             }
         }
