@@ -6,6 +6,27 @@ Gulp coverage reporting for Node.js that is independent of the test runner
 
 gulp-coverage generates block, line, chainable and statement coverage for Node.js JavaScript files. This is equivalent to function, statement, branch and "modified condition/decision" coverage, where a "statement" is equivalent to a "modified condition/decision". The HTML report gives summary information for the block, line and statement covereage across all the files as well as for each file.
 
+##Excluding code from coverage reporting
+
+To exclude a single line from the coverage report, you can append a comment with the content of "cover:false" to the end of the line.
+
+```
+var uncovered = "this line will not be covered"; // cover:false
+```
+
+If you would like to exclude a block of code from coverage reporting, then wrap the block in a pair of comments to turn coverage on and then off. Note that the start and end comments should be at the same indent level or the outcome will not be what you expect. To turn off the coverage, put the text "#JSCOVERAGE_IF" into a comment. To turn it back on, use a comment with one of the following texts "#JSCOVERAGE_IF 0", or "#JSCOVERAGE_ENDIF".
+
+```
+var covered = "this line is covered";
+//#JSCOVERAGE_IF
+if (false) {
+  // this code will never be covered
+  console.log("Why does nobody listen to me?!?!?");
+}
+//#JSCOVERAGE_ENDIF
+var alsoCovered = "this line is also covered";
+```
+
 ##Chainables
 The chainable coverage supports Array-like chainables and will record misses where the chained member calls both receive and result-in an empty array.
 
