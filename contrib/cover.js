@@ -656,16 +656,20 @@ function linesWithData(lines) {
         }
     });
     interim.sort(function(a,b) {return a - b;});
-    unique = [interim[0]];
-    interim.reduce(function(p, c) {
-        if (p === c) {
-            // Can get rid of c
-            return p;
-        } else {
-            unique.push(c);
-            return c;
-        }
-    });
+    if (interim.length) {
+        unique = [interim[0]];
+        interim.reduce(function(p, c) {
+            if (p === c) {
+                // Can get rid of c
+                return p;
+            } else {
+                unique.push(c);
+                return c;
+            }
+        });
+    } else {
+        unique = [];
+    }
     return unique;
 }
 
