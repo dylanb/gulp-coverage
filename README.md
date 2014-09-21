@@ -14,7 +14,7 @@ To exclude a single line from the coverage report, you can append a comment with
 var uncovered = "this line will not be covered"; // cover:false
 ```
 
-If you would like to exclude a block of code from coverage reporting, then wrap the block in a pair of comments to turn coverage on and then off. Note that the start and end comments should be at the same indent level or the outcome will not be what you expect. To turn off the coverage, put the text "#JSCOVERAGE_IF" into a comment. To turn it back on, use a comment with one of the following texts "#JSCOVERAGE_IF 0", or "#JSCOVERAGE_ENDIF".
+If you would like to exclude a block of code from coverage reporting, then wrap the block in a pair of comments to turn coverage off and then back on. Note that the start and end comments should be at the same indent level or the outcome will not be what you expect. To turn off the coverage, put the text "#JSCOVERAGE_IF" into a comment. To turn it back on, use a comment with one of the following texts "#JSCOVERAGE_IF 0", or "#JSCOVERAGE_ENDIF".
 
 ```
 var covered = "this line is covered";
