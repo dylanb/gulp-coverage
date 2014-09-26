@@ -28,7 +28,7 @@ var lintDeps = [],
 function test () {
     return gulp.src(['test/**.js'], { read: false })
         .pipe(mochaTask({
-            reporter: 'spec'
+            reporter: 'spec',
         }));
 }
 
@@ -56,7 +56,7 @@ function mocha () {
     return gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
-            debugDirectory: 'debug'
+            debugDirectory: 'debug/info'
         }))
         .pipe(mochaTask({
             reporter: 'spec'
@@ -72,7 +72,7 @@ function coveralls () {
     return gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
-            debugDirectory: 'debug'
+            debugDirectory: 'debug/info'
         }))
         .pipe(mochaTask({
             reporter: 'spec'
@@ -89,7 +89,7 @@ function rewire () {
     return gulp.src(['testsupport/rewire.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['testsupport/myModule.js'],
-            debugDirectory: 'debug'
+            debugDirectory: 'debug/info'
         }))
         .pipe(mochaTask({
             reporter: 'spec'
@@ -105,7 +105,7 @@ function json () {
     return gulp.src(['testsupport/src.js', 'testsupprt/src3.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/test*'],
-            debugDirectory: 'debug'
+            debugDirectory: 'debug/info'
         }))
         .pipe(mochaTask({
             reporter: 'spec'
@@ -119,7 +119,8 @@ function json () {
 function jasmine () {
     return gulp.src('testsupport/srcjasmine.js')
         .pipe(cover.instrument({
-            pattern: ['**/test*']
+            pattern: ['**/test*'],
+            debugDirectory: 'debug/info'
         }))
         .pipe(jasmineTask())
         .pipe(cover.gather())
@@ -137,7 +138,7 @@ function testchain () {
     return gulp.src(['testsupport/srcchain.js'], { read: false })
         .pipe(cover.instrument({
             pattern: ['**/chain.js'],
-            debugDirectory: 'debug'
+            debugDirectory: 'debug/info'
         }))
         .pipe(mochaTask({
             reporter: 'spec'

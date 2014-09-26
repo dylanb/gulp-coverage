@@ -283,6 +283,42 @@ function relatify(arr) {
     return retVal;
 }
 
+function createFullPathSync(fullPath) {
+    if (!fullPath) {
+        return false;
+    }
+    var parts,
+        working = '/',
+        pathList = [];
+ 
+    if (fullPath[0] !== '/') {
+        fullPath = path.join(process.cwd(), fullPath);
+    }
+    parts = path.normalize(fullPath).split('/');
+    for(var i = 0, max = parts.length; i < max; i++) {
+        working = path.join(working, parts[i]);
+        pathList.push(working);
+    }
+    var recursePathList = function recursePathList(paths) {
+        var working;
+
+        if (!paths.length) {
+            return true;
+        }
+        working = paths.shift();
+        if( !fs.existsSync(working)) {
+            try {
+                fs.mkdirSync(working, 0755);
+            }
+            catch(e) {
+                return false;
+            }
+        }
+        return recursePathList(paths);
+    }
+    return recursePathList(pathList);
+}
+
 /**
  * @class CoverageSession
  * @constructor
@@ -331,9 +367,7 @@ var CoverageSession = function(pattern, debugDirectory) {
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
 
         if (debugDirectory) {
-            if (!fs.existsSync(debugDirectory)) {
-                fs.mkdirSync(debugDirectory);
-            }
+            createFullPathSync(debugDirectory);
             var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, '_') + '.js');
             fs.writeFileSync(outputPath, newCode);
         }
