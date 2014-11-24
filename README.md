@@ -12,7 +12,7 @@ The chainable coverage supports Array-like chainables and will record misses whe
 ##HTML report
 For each covered file, a chain of links is built allowing you to click through from the summary to the first and then all subsequent instances of each type of miss (line misses and statement misses).
 
-![Example Report Showing missed lines, missed statements and chains of links](https://raw2.github.com/dylanb/gulp-coverage/master/screenshots/gulp-coverage.png "Example Report")
+![Example Report Showing missed lines, missed statements and chains of links](https://raw.githubusercontent.com/dylanb/gulp-coverage/master/screenshots/gulp-coverage.png "Example Report")
 
 The HTML report format has been desiged to be accessible and conformant with WCAG 2 Level AA.
 
