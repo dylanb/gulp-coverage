@@ -212,7 +212,7 @@ Calling format with the following arguments will all create two vinyl files in t
 
 ## The Report Task (Deprecated)
 
-This task is deprecated because it does not support the gulp.dest task and will probably be removed before the first 1.0.0 release. Use [The Gather Task](#The-Gather-Task) and [The Format Task](#The-Format-Task) instead.
+This task is deprecated because it does not support the gulp.dest task and will probably be removed before the first 1.0.0 release. Use [The Gather Task](#the-gather-task) and [The Format Task](#the-format-task) instead.
 
 Report will generate the reports for the instrumented files and can only be called after `instrument` has been called. It will also change the stream content for the tasks and pass through the LCOV JSON data so that the enforce task can be run.
 
