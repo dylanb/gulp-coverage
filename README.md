@@ -191,8 +191,8 @@ There are 3 options, here are the default values:
   }
 ```
 
-Output logs a summary of the coverage report to the console if set to tru.
-           
+Output logs a summary of the coverage report to the console if set to true.
+
 Calling format with the following arguments will all create two vinyl files in the gulp stream that have a path of coverage.html and coverage.json respectively:
 
 #### Multiple Formats Example 1
