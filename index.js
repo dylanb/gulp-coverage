@@ -10,6 +10,7 @@ var fs = require('fs');
 var cover = require('./contrib/cover');
 var through2 = require('through2');
 var gutil = require('gulp-util');
+var chalk = require('chalk')
 var coverInst;
 
 module.exports.instrument = function (options) {
