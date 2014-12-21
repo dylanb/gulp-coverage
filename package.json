@@ -1,6 +1,6 @@
 {
-  "name": "gulp-coverage",
-  "version": "0.3.32",
+  "name": "gulp-coverage_output",
+  "version": "0.1.7-output",
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "gulp": "~3.4.0",
     "rewire": "^2.1.0",
     "gulp-coveralls": "^0.1.2",
+    "escape-string-regexp": "~1.0.2",
     "chalk": "~0.5.1"
   },
   "keywords": [

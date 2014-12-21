@@ -10,6 +10,7 @@ var fs = require('fs');
 var cover = require('./contrib/cover');
 var through2 = require('through2');
 var gutil = require('gulp-util');
+var chalk = require('chalk')
 var coverInst;
 
 module.exports.instrument = function (options) {
@@ -81,13 +82,12 @@ module.exports.report = function (options) {
                 if (stats.uncovered.length > 0) {
                     console.log();
                     console.log(chalk.red('  Uncovered files:'));
+                    for (var i = 0; i < stats.uncovered.length; i++) {
+                        console.log('     ' + chalk.red(stats.uncovered[i]));
+                    }
                 } else {
                     console.log();
-                    console.log(chack.green('  All files covered!'));
-                }
-
-                for (var i = 0; i < stats.uncovered.length; i++) {
-                    console.log('     ' + chalk.red(stats.uncovered[i]));
+                    console.log(chalk.green('  All files covered'));
                 }
 
                 console.log();
