@@ -73,21 +73,21 @@ module.exports.report = function (options) {
                     return n;
                 };
 
-                console.log(chalk.underline.bold('Coverage report'));
-                console.log('Line coverage:       ' + _format(lines));
-                console.log('Statement coverage:  ' + _format(statements));
-                console.log('Block coverage:      ' + _format(blocks));
+                console.log(chalk.underline.bold('  Coverage report'));
+                console.log('  Line coverage:       ' + _format(lines));
+                console.log('  Statement coverage:  ' + _format(statements));
+                console.log('  Block coverage:      ' + _format(blocks));
 
                 if (stats.uncovered.length > 0) {
                     console.log();
-                    console.log(chalk.red('Uncovered files:'));
+                    console.log(chalk.red('  Uncovered files:'));
                 } else {
                     console.log();
-                    console.log(chack.green('All files covered'));
+                    console.log(chack.green('  All files covered!'));
                 }
 
                 for (var i = 0; i < stats.uncovered.length; i++) {
-                    console.log('   ' + chalk.red(stats.uncovered[i]));
+                    console.log('     ' + chalk.red(stats.uncovered[i]));
                 }
 
                 console.log();
