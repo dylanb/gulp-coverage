@@ -10,6 +10,7 @@ var fs = require('fs');
 var cover = require('./contrib/cover');
 var through2 = require('through2');
 var gutil = require('gulp-util');
+var chalk = require('chalk')
 var coverInst;
 
 module.exports.instrument = function (options) {
@@ -38,6 +39,7 @@ module.exports.instrument = function (options) {
 module.exports.report = function (options) {
     options = options || {};
     var reporter = options.reporter || 'html';
+    var output   = options.output   || false;
 
     return through2.obj(
         function (file, encoding, cb) {
@@ -53,6 +55,44 @@ module.exports.report = function (options) {
                 throw new Error('Must call instrument before calling report');
             }
             stats = coverInst.allStats();
+
+            if (output) {
+                var lines      = stats.coverage;
+                var statements = stats.statements;
+                var blocks     = stats.blocks;
+
+                var _format = function(n) {
+                    n = n.toFixed(2);
+                    if (n < 60) {
+                        n = chalk.red(n + '%');
+                    } else if (n < 80) {
+                        n = chalk.yellow(n + '%');
+                    } else {
+                        n = chalk.green(n + '%');
+                    }
+
+                    return n;
+                };
+
+                console.log(chalk.underline.bold('  Coverage report'));
+                console.log('  Line coverage:       ' + _format(lines));
+                console.log('  Statement coverage:  ' + _format(statements));
+                console.log('  Block coverage:      ' + _format(blocks));
+
+                if (stats.uncovered.length > 0) {
+                    console.log();
+                    console.log(chalk.red('  Uncovered files:'));
+                    for (var i = 0; i < stats.uncovered.length; i++) {
+                        console.log('     ' + chalk.red(stats.uncovered[i]));
+                    }
+                } else {
+                    console.log();
+                    console.log(chalk.green('  All files covered'));
+                }
+
+                console.log();
+            }
+
             cover.reporters[reporter](stats, options.outFile ? options.outFile : undefined);
             this.push({ coverage: stats });
             cb();
