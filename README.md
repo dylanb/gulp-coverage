@@ -37,7 +37,7 @@ if (false) {
 var alsoCovered = "this line is also covered";
 ```
 
-#Example
+# Example
 
 To instrument and report on a file using Mocha as your test runner:
 
