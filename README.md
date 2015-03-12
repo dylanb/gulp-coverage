@@ -54,7 +54,7 @@ To instrument and report on a file using Mocha as your test runner:
                 .pipe(mocha())
                 .pipe(cover.gather())
                 .pipe(cover.format())
-                .pipe(gulp.dest('reports');
+                .pipe(gulp.dest('reports'));
     });
 ```
 
@@ -73,7 +73,7 @@ To instrument and report using Jasmine as your test system:
                 .pipe(jasmine())
                 .pipe(cover.gather())
                 .pipe(cover.format())
-                .pipe(gulp.dest('reports');
+                .pipe(gulp.dest('reports'));
     });
 ```
 
