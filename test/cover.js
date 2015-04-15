@@ -174,17 +174,20 @@ describe('cover.js', function () {
         stats = coverInst.allStats();
         // console.log(stats);
         it('will return the uncovered files', function () {
+            //console.log(stats.uncovered);
             assert.deepEqual(stats.uncovered, [
+                'testsupport/c2_cov.js',
+                'testsupport/c2_test.js',
                 'testsupport/chain.js',
-                 'testsupport/chainable.js',
-                 'testsupport/myModule.js',
-                 'testsupport/rewire.js',
-                 'testsupport/src.js',
-                 'testsupport/src2.js',
-                 'testsupport/src3.js',
-                 'testsupport/srcchain.js',
-                 'testsupport/srcjasmine.js',
-                 'testsupport/test.js' ]);
+                'testsupport/chainable.js',
+                'testsupport/myModule.js',
+                'testsupport/rewire.js',
+                'testsupport/src.js',
+                'testsupport/src2.js',
+                'testsupport/src3.js',
+                'testsupport/srcchain.js',
+                'testsupport/srcjasmine.js',
+                'testsupport/test.js' ]);
         });
         it('will return the correct number of code lines', function () {
             assert.equal(stats.sloc, 9);

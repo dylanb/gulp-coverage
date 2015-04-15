@@ -155,6 +155,27 @@ function testchain () {
         .pipe(gulp.dest('./testoutput'));
 }
 
+
+function testc2 () {
+    return gulp.src(['testsupport/c2_test.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['**/c2_cov.js'],
+            debugDirectory: 'debug/info'
+        }))
+        .pipe(mochaTask({
+            reporter: 'spec'
+        }))
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'c2.html'
+        }))
+        .pipe(gulp.dest('./testoutput'))
+        .pipe(cover.format({
+            outFile: 'c2.json',
+            reporter: 'json'
+        }))
+        .pipe(gulp.dest('./testoutput'));
+}
 /*
  * setup function
  */
@@ -187,6 +208,8 @@ gulp.task('default', function() {
 });
 
 gulp.task('debug', debugDeps, debug);
+
+gulp.task('c2', [], testc2);
 
 setup();
 
