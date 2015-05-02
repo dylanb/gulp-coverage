@@ -22,7 +22,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var instrument = require('./instrument');
+var instrument = require('instrumentjs');
 var Module = require('module').Module;
 var path = require('path');
 var fs = require('fs');
