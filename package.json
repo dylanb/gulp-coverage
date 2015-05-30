@@ -1,18 +1,19 @@
 {
   "name": "gulp-coverage",
-  "version": "0.3.34",
+  "version": "0.3.35",
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
     "test": "gulp test"
   },
   "dependencies": {
+    "extend": "~1.2.1",
+    "gulp-util": "~2.2.13",
+    "instrumentjs": "0.0.2",
     "jade": "~1.1.4",
-    "underscore": "~1.5.2",
     "multimatch": "~0.1.0",
     "through2": "~0.4.0",
-    "extend": "~1.2.1",
-    "gulp-util": "~2.2.13"
+    "underscore": "~1.5.2"
   },
   "devDependencies": {
     "gulp-mocha": "~0.4.1",
