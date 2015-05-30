@@ -219,6 +219,28 @@ describe('gulp-coverage', function () {
             });
             writer.end();
         });
+        it('Does correctly support module pattern', function (done) {
+            reader = through2.obj(function (data, enc, cb) {
+                assert.ok(data.coverage);
+                // this next test makes sure that comments and other lines that do not
+                // contain statements will get output to the HTML report
+                assert.equal(data.coverage.files[0].source[18].coverage, -1);
+                cb();
+            },
+            function (cb) {
+                cb();
+                done();
+            });
+            writer.pipe(cover.instrument({
+                pattern: ['./testsupport/test*'],
+                debugDirectory: path.join(process.cwd(), 'debug')
+            })).pipe(mocha({
+            })).pipe(cover.gather()).pipe(reader);
+            writer.write({
+                path: require.resolve('../testsupport/src4.js')
+            });
+            writer.end();
+        });
     });
     describe('enforce', function () {
         it('should throw if not passed the correct data', function(done) {
@@ -446,7 +468,7 @@ describe('gulp-coverage', function () {
                 statements: 80,
                 lines: 83,
                 blocks: 60,
-                uncovered: 1
+                uncovered: 2
             })).pipe(reader);
             writer.write({
                 path: require.resolve('../testsupport/src.js')

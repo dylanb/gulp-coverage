@@ -50,8 +50,8 @@ html
                   for line, number in file.source
                     tr(class=coverageCategory(line))
                       td.line #{number + 1}
-                      td.hits #{line.coverage ? line.coverage : (line.coverage === 0 ? 0 : '')}
-                      td.statements #{line.coverage ? line.statements.toFixed(0) + '%' : ''}
+                      td.hits #{line.coverage > 0 ? line.coverage : (line.coverage === 0 ? 0 : '')}
+                      td.statements #{line.coverage > 0 ? line.statements.toFixed(0) + '%' : ''}
                       td.source
                         for segment in line.segments
                           span(class="statement #{segment.count ? '' : 'notok'}")

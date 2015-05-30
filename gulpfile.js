@@ -19,6 +19,7 @@ var lintDeps = [],
     jasmineDeps = [],
     testchainDeps = [],
     rewireDeps = [],
+    classPatternDeps = [],
     coverallsDeps = [];
 
 /*
@@ -67,6 +68,24 @@ function mocha () {
         }))
         .pipe(gulp.dest('./testoutput'));
 }
+
+function classPattern () {
+    return gulp.src(['testsupport/src4.js'], { read: false })
+        .pipe(cover.instrument({
+            pattern: ['**/test3.js'],
+            debugDirectory: 'debug/info'
+        }))
+        .pipe(mochaTask({
+            reporter: 'spec'
+        }))
+        .pipe(cover.gather())
+        .pipe(cover.format({
+            outFile: 'classPattern.html'
+        }))
+        .pipe(gulp.dest('./testoutput'));
+}
+
+
 
 function coveralls () {
     return gulp.src(['testsupport/src.js', 'testsupport/src3.js'], { read: false })
@@ -183,6 +202,7 @@ function testc2 () {
 function setup () {
     gulp.task('coveralls', coverallsDeps, coveralls);
     gulp.task('rewire', rewireDeps, rewire);
+    gulp.task('classPattern', classPatternDeps, classPattern);
     gulp.task('test', testDeps, test);
     gulp.task('lint', lintDeps, lint);
     gulp.task('mocha', mochaDeps, mocha);
@@ -197,6 +217,7 @@ function setup () {
 
 gulp.task('default', function() {
     // Setup the chain of dependencies
+    coverallsDeps = ['classPattern'];
     rewireDeps = ['coveralls'];
     testchainDeps = ['rewire'];
     jasmineDeps = ['testchain'];

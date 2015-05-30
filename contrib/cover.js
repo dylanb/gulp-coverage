@@ -809,7 +809,7 @@ CoverageSession.prototype.allStats = function () {
         lines = fstats.lineDetails;
         sourceArray = [];
         code.forEach(function(codeLine, index){
-            var count = null, statements = null, numStatements = 0, segs, lineNo, allSame = true, lineStruct;
+            var count = -1, statements = null, numStatements = 0, segs, lineNo, allSame = true, lineStruct;
             line = lines[index];
             if (line && line.statementDetails[0]) {
                 count = line.count;
@@ -832,17 +832,15 @@ CoverageSession.prototype.allStats = function () {
                         count: count
                     }];
                 }
-            } else if (dataLines.indexOf(index+1) === -1) {
+            } else {
                 segs = [{
                     code: codeLine,
                     count: 0
                 }];
-            } else {
-                return;
             }
             lineStruct = {
                 coverage: count,
-                statements: statements === null ? null : (statements / numStatements) * 100,
+                statements: statements === null ? 100 : (statements / numStatements) * 100,
                 segments: segs
             };
             sourceArray.push(lineStruct);
