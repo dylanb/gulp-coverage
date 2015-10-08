@@ -516,6 +516,9 @@ function getSegments(code, lines, count, statementDetails) {
         return (a.start - b.start);
     });
     var combined = [splintered[0]];
+    if(splintered.length === 0){
+        return [];
+    }
     splintered.reduce(function(p, c) {
         if (p && p.start <= c.start && p.end >= c.end &&
             (p.count === c.count || (p.count && c.count))) {
