@@ -90,7 +90,7 @@ FileCoverageData.prototype._blocks = function() {
     var numSeenBlocks = 0;
     for(var index in this.visitedBlocks) {
         numSeenBlocks++;
-    }    
+    }
     var toReturn = {
         total: totalBlocks,
         seen: numSeenBlocks
@@ -146,7 +146,7 @@ FileCoverageData.prototype._prepare = function() {
 };
 
 /**
- * 
+ *
  * Get statistics for the entire file, including per-line code coverage
  * statement coverage and block-level coverage
  * This function returns an object with the following structure:
@@ -290,7 +290,7 @@ function createFullPathSync(fullPath) {
     var parts,
         working = '/',
         pathList = [];
- 
+
     if (fullPath[0] !== '/') {
         fullPath = path.join(process.cwd(), fullPath);
     }
@@ -374,7 +374,7 @@ var CoverageSession = function(pattern, debugDirectory) {
 
         return module._compile(newCode, filename);
     };
-    
+
 };
 
 /**
@@ -469,11 +469,11 @@ function getSegments(code, lines, count, statementDetails) {
         var size = (sd[i].end - sd[i].start + 1 < 0) ? 0 : sd[i].end - sd[i].start + 1;
         var us = new Array(size);
         for (k = sd[i].end - sd[i].start; k >= 0; k--) {
-            us[k] = 1;                
+            us[k] = 1;
         }
         for (j = 0; j < sd.length; j++) {
             if (j !== i) {
-                if (sd[i].start <= sd[j].start && sd[i].end >= sd[j].end && 
+                if (sd[i].start <= sd[j].start && sd[i].end >= sd[j].end &&
                     (sd[i].count !== sd[j].count || !sd[i].count || !sd[j].count)) {
                     for ( k = sd[j].start; k <= sd[j].end; k++) {
                         us[k - sd[i].start] = 0;
@@ -508,6 +508,9 @@ function getSegments(code, lines, count, statementDetails) {
         } else {
             splintered.push(sd[i]);
         }
+    }
+    if (splintered.length === 0) {
+        return [];
     }
     splintered.sort(function(a, b) {
         return (b.end - a.end);
@@ -579,7 +582,7 @@ function splitOverlaps(lines, code) {
                     } else {
                         lines[i].statementDetails.splice(j, 1);
                     }
-                }            
+                }
             }
             if (lines[i].statementDetails[0] && lines[i].statementDetails[0].loc.start.column) {
                 lines[i].statementDetails[0].loc.start.column = 0;
@@ -759,7 +762,7 @@ function getAllFiles(dir) {
  *        count: Integer - number of times the line was hit
  *        statements: Float - the percentage of statements covered
  *        segments: Array[Object] - the segments of statements that make up the line
- * }  
+ * }
  *
  * Each statement segment has the following structure
  * {
@@ -888,7 +891,7 @@ CoverageSession.prototype.allStats = function () {
  * @param {String} debugDirectory - the name of the director to contain debug instrumentation files
  * @return {Object} the CoverageSession instance
  */
-var cover = function(pattern, debugDirectory) {    
+var cover = function(pattern, debugDirectory) {
     return new CoverageSession(pattern, debugDirectory);
 };
 
