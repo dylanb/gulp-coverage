@@ -1,24 +1,24 @@
 
 // Instrumentation Header
 {
-    var fs = require('fs');
+    var _fs = require('fs');
     var <%= instrumented.names.statement %>, <%= instrumented.names.expression %>, <%= instrumented.names.block %>;
     var store = require('<%= coverageStorePath %>');
-    
+
     <%= instrumented.names.statement %> = function(i) {
         var fd = store.register('<%= filename %>');
-        fs.writeSync(fd, '{"statement": {"node": ' + i + '}},\n');
-    }; 
-    
+        _fs.writeSync(fd, '{"statement": {"node": ' + i + '}},\n');
+    };
+
     <%= instrumented.names.expression %> = function(i) {
         var fd = store.register('<%= filename %>');
-        fs.writeSync(fd, '{"expression": {"node": ' + i + '}},\n');
-    }; 
-    
+        _fs.writeSync(fd, '{"expression": {"node": ' + i + '}},\n');
+    };
+
     <%= instrumented.names.block %> = function(i) {
         var fd = store.register('<%= filename %>');
-        fs.writeSync(fd, '{"block": ' + i + '},\n');
-    }; 
+        _fs.writeSync(fd, '{"block": ' + i + '},\n');
+    };
     <%= instrumented.names.intro %> = function(id, obj) {
         // console.log('__intro: ', id, ', obj.__instrumented_miss: ', obj.__instrumented_miss, ', obj.length: ', obj.length);
         (typeof obj === 'object' || typeof obj === 'function') &&
@@ -48,11 +48,11 @@
                 // and it did not return anything from the chainable, it is a miss
                 // console.log('miss: ', id);
             } else {
-                fs.writeSync(fd, '{"chain": {"node": ' + id + '}},\n');
+                _fs.writeSync(fd, '{"chain": {"node": ' + id + '}},\n');
             }
             obj.__instrumented_miss[id] = undefined;
         } else {
-            fs.writeSync(fd, '{"chain": {"node": ' + id + '}},\n');
+            _fs.writeSync(fd, '{"chain": {"node": ' + id + '}},\n');
         }
         return obj;
     };
