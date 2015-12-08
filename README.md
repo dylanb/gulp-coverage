@@ -46,9 +46,9 @@ To instrument and report on a file using Mocha as your test runner:
     cover = require('gulp-coverage');
 
     gulp.task('test', function () {
-        return gulp.src(['src.js', 'src2.js'], { read: false })
+        return gulp.src('tests/**/*.js', { read: false })
                 .pipe(cover.instrument({
-                    pattern: ['**/test*'],
+                    pattern: ['src/**/*.js'],
                     debugDirectory: 'debug'
                 }))
                 .pipe(mocha())
@@ -65,15 +65,34 @@ To instrument and report using Jasmine as your test system:
     cover = require('gulp-coverage');
 
     gulp.task('jasmine', function () {
-        return gulp.src('srcjasmine.js')
+        return gulp.src('tests/**/*.js')
                 .pipe(cover.instrument({
-                    pattern: ['**/test*'],
+                    pattern: ['src/**/*.js'],
                     debugDirectory: 'debug'
                 }))
                 .pipe(jasmine())
                 .pipe(cover.gather())
                 .pipe(cover.format())
                 .pipe(gulp.dest('reports'));
+    });
+```
+
+To report coverage with gulp-coveralls:
+
+```js
+    mocha = require('gulp-mocha');
+    cover = require('gulp-coverage');
+    coveralls = require('gulp-coveralls');
+
+    gulp.task('coveralls', function () {
+        return gulp.src('tests/**/*.js', { read: false })
+                .pipe(cover.instrument({
+                    pattern: ['src/**/*.js']
+                }))
+                .pipe(mocha()) // or .pipe(jasmine()) if using jasmine
+                .pipe(cover.gather())
+                .pipe(cover.format({ reporter: 'lcov' }))
+                .pipe(coveralls());
     });
 ```
 
