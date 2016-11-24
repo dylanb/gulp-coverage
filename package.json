@@ -4,16 +4,19 @@
   "description": "Instrument and generate code coverage independent of test runner",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "extend": "~1.2.1",
     "gulp-util": "~2.2.13",
     "instrumentjs": "0.0.2",
-    "jade": "~1.1.4",
-    "multimatch": "~0.1.0",
+    "jade": "~1.8.0",
+    "multimatch": "~2.1.0",
     "through2": "~0.4.0",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "snyk": "^1.20.0"
   },
   "devDependencies": {
     "gulp-mocha": "~0.4.1",
@@ -35,5 +38,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/dylanb/gulp-coverage.git"
-  }
+  },
+  "snyk": true
 }
