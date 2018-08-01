@@ -7,7 +7,7 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "extend": "~1.2.1",
+    "extend": "~2.0.2",
     "gulp-util": "~2.2.13",
     "instrumentjs": "0.0.2",
     "jade": "~1.1.4",
